@@ -13,27 +13,55 @@ class InformacionPersonalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = informacionpersonal::all();
-        if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
-        }
-
-        // Convertir todos los campos a UTF-8 válido
-        $data = $data->map(function ($item) {
-            $attributes = $item->getAttributes();
-            foreach ($attributes as $key => $value) {
-                if (is_string($value)) {
-                    $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-                }
-            }
-            return $attributes;
-        });
-
-        // Ahora intenta convertir a JSON
         try {
-            return response()->json($data);
+            // Obtén los datos paginados
+            $query = informacionpersonal::select('informacionpersonal.*');
+            // Verificar si se solicita todos los datos sin paginación
+            if ($request->has('all') && $request->all === 'true') {
+                $data = $query->get();
+
+                // Convertir los datos a UTF-8 válido
+                $data->transform(function ($item) {
+                    $attributes = $item->getAttributes();
+                    foreach ($attributes as $key => $value) {
+                        if (is_string($value)) {
+                            $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                        }
+                    }
+                    return $attributes;
+                });
+
+                return response()->json(['data' => $data]);
+            }
+
+            // Paginación por defecto
+            $data = $query->paginate(20);
+
+            if ($data->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron datos'], 404);
+            }
+
+            // Convertir los datos de cada página a UTF-8 válido
+            $data->getCollection()->transform(function ($item) {
+                $attributes = $item->getAttributes();
+                foreach ($attributes as $key => $value) {
+                    if (is_string($value)) {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+                return $attributes;
+            });
+
+            // Retornar respuesta JSON con metadatos de paginación
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
@@ -60,31 +88,37 @@ class InformacionPersonalController extends Controller
      */
     public function show(string $id)
     {
-        $data = informacionpersonal::select('informacionpersonal.*')
-        ->where('informacionpersonal.CIInfPer', $id)
-        ->get();
+       // Aplica paginación al resultado del filtro
+       $data = informacionpersonal::select('informacionpersonal.*')
+       ->where('informacionpersonal.CIInfPer', $id)
+       ->paginate(20);
+       if ($data->isEmpty()) {
+           return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+       }
 
-        if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
-        }
+       // Convertir los campos a UTF-8 válido para cada página
+       $data->getCollection()->transform(function ($item) {
+           $attributes = $item->getAttributes();
+           foreach ($attributes as $key => $value) {
+               if (is_string($value)) {
+                   $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+               }
+           }
+           return $attributes;
+       });
 
-        // Convertir todos los campos a UTF-8 válido
-        $data = $data->map(function ($item) {
-            $attributes = $item->getAttributes();
-            foreach ($attributes as $key => $value) {
-                if (is_string($value)) {
-                    $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-                }
-            }
-            return $attributes;
-        });
-
-        // Ahora intenta convertir a JSON
-        try {
-            return response()->json($data);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
-        }
+       // Retornar la respuesta JSON con los metadatos de paginación
+       try {
+           return response()->json([
+               'data' => $data->items(),
+               'current_page' => $data->currentPage(),
+               'per_page' => $data->perPage(),
+               'total' => $data->total(),
+               'last_page' => $data->lastPage(),
+           ]);
+       } catch (\Exception $e) {
+           return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+       }
     }
 
     /**

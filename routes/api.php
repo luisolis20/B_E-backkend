@@ -20,6 +20,7 @@ use App\Http\Controllers\ConstEstadoPOSTController;
 use App\Http\Controllers\ConstPostUsersEstadoController;
 use App\Http\Controllers\Oferta_Empleo2Controller;
 use App\Http\Controllers\EnviarComentarioController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,22 +36,35 @@ use App\Http\Controllers\EnviarComentarioController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::apiResource("vin/empresas",EmpresaController::class);
-Route::apiResource("vin/users",UserController::class);
-Route::apiResource("vin/oferta__empleos",Oferta_EmpleoController::class);
-Route::apiResource("vin/oferta__empleos2",Oferta_Empleo2Controller::class);
-Route::apiResource("vin/postulacions",PostulacionController::class);
-Route::post('vin/enviar-comentario', [EnviarComentarioController::class, 'enviarComentario']);
-Route::post('vin/login', [InformacionPersonalController::class, 'login']);
-Route::apiResource('vin/informacionpersonal', InformacionPersonalController::class);
-Route::apiResource('vin/registrotitulos', RegistroTituloController::class);
-Route::apiResource('vin/consultaredir',ConsultaController::class);
-Route::apiResource('vin/consultapost',ConstPostuController::class);
-Route::apiResource('vin/consultapostuser',ConstPostUsersController::class);
-Route::apiResource('vin/consultapostuserestado',ConstPostUsersEstadoController::class);
-Route::apiResource('vin/consultaofert',ConstOfertController::class);
-Route::apiResource('vin/consultanopostofert',ConstOfertasNOPOST::class);
-Route::apiResource('vin/estadopostuser',ConstEstadoPOSTController::class);
-Route::post('vin/enviar-correo', [CorreoController::class, 'enviarCorreo']);
-Route::post('vin/enviar-aceptacion-postulacion', [EmailController::class, 'enviarAceptacionPostulacion']);
-Route::delete('vin/eliminar-postulacion/{id}', [EliminarPostulacionController::class, 'eliminarPostulacion']);
+Route::prefix('b_e')->group(function () {
+
+    Route::apiResource("vin/empresas",EmpresaController::class);
+    Route::apiResource("vin/users",UserController::class);
+    Route::apiResource("vin/oferta__empleos",Oferta_EmpleoController::class);
+    Route::apiResource("vin/oferta__empleos2",Oferta_Empleo2Controller::class);
+    Route::apiResource("vin/postulacions",PostulacionController::class);
+    Route::post('vin/enviar-comentario', [EnviarComentarioController::class, 'enviarComentario']);
+    Route::post('vin/login', [InformacionPersonalController::class, 'login']);
+    Route::apiResource('vin/informacionpersonal', InformacionPersonalController::class);
+    Route::apiResource('vin/registrotitulos', RegistroTituloController::class);
+    Route::apiResource('vin/consultaredir',ConsultaController::class);
+    Route::apiResource('vin/consultapost',ConstPostuController::class);
+    Route::apiResource('vin/consultapostuser',ConstPostUsersController::class);
+    Route::apiResource('vin/consultapostuserestado',ConstPostUsersEstadoController::class);
+    Route::apiResource('vin/consultaofert',ConstOfertController::class);
+    Route::apiResource('vin/consultanopostofert',ConstOfertasNOPOST::class);
+    Route::apiResource('vin/estadopostuser',ConstEstadoPOSTController::class);
+    Route::post('vin/enviar-correo', [CorreoController::class, 'enviarCorreo']);
+    Route::post('vin/enviar-aceptacion-postulacion', [EmailController::class, 'enviarAceptacionPostulacion']);
+    Route::delete('vin/eliminar-postulacion/{id}', [EliminarPostulacionController::class, 'eliminarPostulacion']);
+
+    //Login
+
+    
+    Route::post('login2', [AuthController::class, 'login']);
+    Route::middleware('auth:api')->group(function () {
+        Route::get('me', [AuthController::class, 'me']);
+        Route::post('refresh', [AuthController::class, 'refresh']);
+        Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+    });
+});

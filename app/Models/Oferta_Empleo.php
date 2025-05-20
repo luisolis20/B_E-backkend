@@ -17,13 +17,13 @@ class Oferta_Empleo extends Model
         'tipo_contrato',
         'modalidad',
         'categoria',
-        'empresa_id',
+        'id_empresa',
     ];
 
     
      public function empresa()
      {
-         return $this->belongsTo(Empresa::class, 'empresa_id');
+         return $this->belongsTo(Empresa::class, 'id_empresa');
      }
  
      

@@ -59,15 +59,11 @@ class UserController extends Controller
     {
         $res = User::find($id);
         if(isset($res)){
-            $res->firts_name = $request->firts_name;
-            $res->last_name = $request->last_name;
+            $res->name = $request->firts_name;
             $res->email = $request->email;
             $res->password = Hash::make($request->password);
-            $res->rol = $request->rol;
-            $res->link = $request->link;
-            $res->telefono = $request->telefono;
-            $res->direccion = $request->direccion;
-            $res->imagen = $request->imagen;
+            $res->role = $request->role;
+            $res->estado = $request->estado;
             if($res->save()){
                 return response()->json([
                     'data'=>$res,

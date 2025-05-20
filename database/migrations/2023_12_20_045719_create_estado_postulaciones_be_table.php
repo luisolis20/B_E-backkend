@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('estado_postulaciones_be', function (Blueprint $table) {
+        Schema::create('be_estado_postulaciones', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('postulacion_id');
-            $table->foreign('postulacion_id')->references('id')->on('postulacions_be')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('postulacion_id')->references('id')->on('be_postulacions')->onDelete('cascade')->onUpdate('cascade');
             $table->string('estado')->default('pendiente'); // 'aceptado', 'rechazado', 'pendiente'
             $table->dateTime('fecha')->nullable();
             $table->timestamps();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('estado_postulaciones_be');
+        Schema::dropIfExists('be_estado_postulaciones');
     }
 };

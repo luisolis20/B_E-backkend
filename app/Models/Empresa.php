@@ -8,17 +8,28 @@ use Illuminate\Database\Eloquent\Model;
 class Empresa extends Model
 {
     use HasFactory;
-    protected $table = 'empresas_be';
+    protected $table = 'praempresa';
     protected $fillable = [
-        'nombre',
-        'ciudad',
+        'idempresa',
+        'ruc',
+        'empresacorta',
+        'empresa',
         'pais',
-        'descripcion',
-        'vision',
+        'lugar',
         'mision',
-        'telefono',
         'direccion',
-        'tipo_empresa',
+        'telefono',
+        'email',
+        'url',
+        'logo',
+        'tipo',
+        'titulo',
+        'representante',
+        'cargo',
+        'actividad',
+        'fechafin',
+        'tipoinstitucion',
+        'imagen',
         'usuario_id',
     ];
 
@@ -29,6 +40,6 @@ class Empresa extends Model
     
     public function ofertasEmpleo()
     {
-        return $this->hasMany(Oferta_Empleo::class, 'empresa_id');
+        return $this->hasMany(Oferta_Empleo::class, 'id_empresa');
     }
 }
