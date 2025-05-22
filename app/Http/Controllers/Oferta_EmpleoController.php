@@ -32,9 +32,9 @@ class Oferta_EmpleoController extends Controller
      */
     public function show(string $id)
     {
-        $res = Oferta_Empleo::join('empresas_be', 'empresas_be.id', '=', 'oferta__empleos_be.empresa_id')
-        ->join('users_be', 'users_be.id', '=', 'empresas_be.usuario_id')
-        ->where('users_be.id', $id)
+        $res = Oferta_Empleo::join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+        ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+        ->where('be_users.id', $id)
         ->select('oferta__empleos_be.*')
         ->get();
         if ($res) {

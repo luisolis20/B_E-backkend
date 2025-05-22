@@ -30,14 +30,14 @@ class ConstPostUsersEstadoController extends Controller
     {
         $res = Postulacion::select(
             'postulacions_be.id',
-            'empresas_be.nombre as Empresa',
+            'praempresa.empresacorta as Empresa',
             'oferta__empleos_be.titulo as Oferta',
             'oferta__empleos_be.categoria',
            'estado_postulaciones_be.estado',
             'postulacions_be.created_at'
         )
         ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
-        ->join('empresas_be', 'empresas_be.id', '=', 'oferta__empleos_be.empresa_id')
+        ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
         ->join('estado_postulaciones_be', 'estado_postulaciones_be.postulacion_id', '=', 'postulacions_be.id')
         ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
         ->where('informacionpersonal.CIInfPer', $id)

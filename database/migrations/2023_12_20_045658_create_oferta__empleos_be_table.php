@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('be_oferta__empleos', function (Blueprint $table) {
+        Schema::create('oferta__empleos_be', function (Blueprint $table) {
             $table->id();
             $table->string('titulo');
             $table->longtext('descripcion');
@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('tipo_contrato');
             $table->string('modalidad');
             $table->string('categoria');
-            $table->unsignedBigInteger('id_empresa');
-            $table->foreign('id_empresa')->references('idempresa')->on('praempresa')->onDelete('cascade')->onUpdate('cascade');
+            $table->unsignedBigInteger('empresa_id');
+            $table->foreign('empresa_id')->references('idempresa')->on('praempresa')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('be_oferta__empleos');
+        Schema::dropIfExists('oferta__empleos_be');
     }
 };

@@ -23,7 +23,7 @@ class EnviarComentarioController extends Controller
         }else{
             try {
                 // Envía el correo electrónico al destinatario especificado
-                Mail::to('bolsaempleoutlvte@gmail.com')->send(new EnviarComentario($nombre, $correo, $mensaje));
+                Mail::to('vinculacion@utelvt.edu.ec')->send(new EnviarComentario($nombre, $correo, $mensaje));
         
                 return response()->json(['message' => 'Comentario enviado con éxito'], 200);
             } catch (\Exception $e) {

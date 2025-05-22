@@ -9,13 +9,15 @@ class Empresa extends Model
 {
     use HasFactory;
     protected $table = 'praempresa';
+    protected $primaryKey = 'idempresa';
     protected $fillable = [
         'idempresa',
         'ruc',
-        'empresacorta',
         'empresa',
+        'empresacorta',
         'pais',
         'lugar',
+        'vision',
         'mision',
         'direccion',
         'telefono',
@@ -40,6 +42,6 @@ class Empresa extends Model
     
     public function ofertasEmpleo()
     {
-        return $this->hasMany(Oferta_Empleo::class, 'id_empresa');
+        return $this->hasMany(Oferta_Empleo::class, 'empresa_id');
     }
 }

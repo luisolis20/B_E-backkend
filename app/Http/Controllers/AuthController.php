@@ -73,6 +73,18 @@ class AuthController extends Controller
                     'token_type' => 'bearer'
                 ]);
             }else{
+                 $user2 = User::updateOrCreate(
+                    ['email' => $res->mailPer],
+                    [
+                        'name' => $res->ApellInfPer,
+                        'CIInfPer' => $res->CIInfPer,
+                        'password' => bcrypt($codigo_dactilar),
+                        'role' => 'Estudiante',
+                        'estado' => 1,
+                    ]
+                );
+        
+                $token2 = auth()->login($user2);
                 return response()->json([
                     'mensaje' => 'El usuario estudiante aun no se ha graduado',
                     'Rol' => 'Estudiante',
@@ -80,6 +92,9 @@ class AuthController extends Controller
                     'CIInfPer' => $res->CIInfPer,
                     'ApellInfPer' => $res->ApellInfPer,
                     'mailPer' => $res->mailPer,
+                    'token' => $token2,
+                    'token_type' => 'bearer'
+                    
                 ]);
             }
         }
