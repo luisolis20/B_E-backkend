@@ -10,6 +10,7 @@ class Empresa extends Model
     use HasFactory;
     protected $table = 'praempresa';
     protected $primaryKey = 'idempresa';
+    public $timestamps = false;
     protected $fillable = [
         'idempresa',
         'ruc',

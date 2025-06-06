@@ -22,8 +22,8 @@ return new class extends Migration
             $table->longtext('mision')->nullable();
             $table->string('direccion', 255)->nullable();
             $table->string('telefono', 255)->nullable();
-            $table->string('email', 100)->nullable();
-            $table->string('url', 105)->nullable();
+            $table->string('email', 255)->nullable();
+            $table->string('url', 255)->nullable();
             $table->string('logo', 45)->nullable();
             $table->string('tipo', 255)->nullable();
             $table->string('titulo', 65)->nullable();

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('tipo_contrato');
             $table->string('modalidad');
             $table->string('categoria');
+            $table->date('fechaFinOferta')->nullable();
             $table->unsignedBigInteger('empresa_id');
             $table->foreign('empresa_id')->references('idempresa')->on('praempresa')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
