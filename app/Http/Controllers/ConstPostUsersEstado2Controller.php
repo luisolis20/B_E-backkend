@@ -5,7 +5,7 @@ use App\Models\Postulacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class ConstPostUsersEstadoController extends Controller
+class ConstPostUsersEstado2Controller extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -42,7 +42,7 @@ class ConstPostUsersEstadoController extends Controller
         ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
         ->join('estado_postulaciones_be', 'estado_postulaciones_be.postulacion_id', '=', 'postulacions_be.id')
         ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
-        ->where('informacionpersonal.CIInfPer', $id)
+        ->where('postulacions_be.id', $id)
        ->paginate(20);
 
         if ($data->isEmpty()) {

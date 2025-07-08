@@ -57,6 +57,7 @@ class Oferta_Empleo2Controller extends Controller
             $res->tipo_contrato = $request->tipo_contrato;
             $res->modalidad = $request->modalidad;
             $res->categoria = $request->categoria;
+            $res->fechaFinOferta = $request->fechaFinOferta;
             $res->empresa_id = $request->empresa_id;
             if($res->save()){
                 return response()->json([

@@ -15,6 +15,7 @@ class EstadoPostulacion extends Model
     protected $fillable = [
         'postulacion_id',
         'estado',
+        'detalle_estado',
         'fecha',
     ];
 

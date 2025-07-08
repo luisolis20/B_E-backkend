@@ -35,7 +35,7 @@ class ConstOfertController extends Controller
     {
         $res = Oferta_Empleo::select('oferta__empleos_be.id','oferta__empleos_be.empresa_id','praempresa.empresacorta as Empresa','praempresa.lugar', 'praempresa.telefono',
         'praempresa.direccion',
-        'oferta__empleos_be.titulo', 'oferta__empleos_be.descripcion','oferta__empleos_be.categoria','oferta__empleos_be.jornada','oferta__empleos_be.modalidad',
+        'oferta__empleos_be.titulo', 'oferta__empleos_be.descripcion','oferta__empleos_be.categoria','oferta__empleos_be.fechaFinOferta','oferta__empleos_be.jornada','oferta__empleos_be.modalidad',
         'oferta__empleos_be.tipo_contrato', 'oferta__empleos_be.requisistos as Requisitos', 'praempresa.representante as Jefe','oferta__empleos_be.created_at')
         ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
         ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')

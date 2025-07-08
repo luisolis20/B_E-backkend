@@ -1,11 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\EstadoPostulacion;
+use App\Models\Postulacion;
 use Illuminate\Http\Request;
 
-class ConstEstadoPOSTController extends Controller
+class Postulacion2Controller extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,11 +13,24 @@ class ConstEstadoPOSTController extends Controller
     {
         try{
 
-            $query= EstadoPostulacion::select('estado_postulaciones_be.*');
-            // Verificar si se solicita todos los datos sin paginación
+            $query = Postulacion::select(
+                'postulacions_be.id',
+                'praempresa.empresacorta as Empresa',
+                'oferta__empleos_be.titulo as Oferta',
+                'oferta__empleos_be.descripcion',
+                'informacionpersonal.CIInfPer',
+                'informacionpersonal.ApellInfPer',
+                'informacionpersonal.ApellMatInfPer',
+                'informacionpersonal.NombInfPer',
+                'informacionpersonal.mailPer',
+                'postulacions_be.created_at'
+            )
+            ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
+            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer');
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
-
+    
                 // Convertir los datos a UTF-8 válido
                 $data->transform(function ($item) {
                     $attributes = $item->getAttributes();
@@ -29,17 +41,17 @@ class ConstEstadoPOSTController extends Controller
                     }
                     return $attributes;
                 });
-
+    
                 return response()->json(['data' => $data]);
             }
-
+    
             // Paginación por defecto
             $data = $query->paginate(20);
-
+    
             if ($data->isEmpty()) {
                 return response()->json(['error' => 'No se encontraron datos'], 404);
             }
-
+    
             // Convertir los datos de cada página a UTF-8 válido
             $data->getCollection()->transform(function ($item) {
                 $attributes = $item->getAttributes();
@@ -50,7 +62,7 @@ class ConstEstadoPOSTController extends Controller
                 }
                 return $attributes;
             });
-
+    
             // Retornar respuesta JSON con metadatos de paginación
             return response()->json([
                 'data' => $data->items(),
@@ -62,8 +74,6 @@ class ConstEstadoPOSTController extends Controller
         }catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
-    
-       
     }
 
     /**
@@ -72,10 +82,10 @@ class ConstEstadoPOSTController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        $res = EstadoPostulacion::create($inputs);
+        $res = Postulacion::create($inputs);
         return response()->json([
             'data'=>$res,
-            'mensaje'=>"Postulación Aceptada",
+            'mensaje'=>"Agregado con Éxito!!",
         ]);
     }
 
@@ -84,32 +94,23 @@ class ConstEstadoPOSTController extends Controller
      */
     public function show(string $id)
     {
-        $data = EstadoPostulacion::select(
-            'estado_postulaciones_be.id',
-            'estado_postulaciones_be.postulacion_id',
-            'estado_postulaciones_be.estado',
-            'estado_postulaciones_be.fecha',
-            'estado_postulaciones_be.detalle_estado',
-            'praempresa.idempresa as IDEmpresa',
+        $data = Postulacion::select(
+            'postulacions_be.id',
             'praempresa.empresacorta as Empresa',
+            'oferta__empleos_be.titulo as Oferta',
+            'oferta__empleos_be.descripcion',
             'informacionpersonal.CIInfPer',
             'informacionpersonal.ApellInfPer',
             'informacionpersonal.ApellMatInfPer',
             'informacionpersonal.NombInfPer',
             'informacionpersonal.mailPer',
-            'informacionpersonal.CelularInfPer',
-            'informacionpersonal.DirecDomicilioPer',
-            'oferta__empleos_be.titulo as Oferta',
-            'oferta__empleos_be.id as IDOferta',
-            'estado_postulaciones_be.created_at'
+            'postulacions_be.created_at'
         )
-        ->join('postulacions_be', 'postulacions_be.id', '=', 'estado_postulaciones_be.postulacion_id')
         ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
         ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
         ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
-        ->where('informacionpersonal.CIInfPer', $id)
+        ->where('oferta__empleos_be.id', $id)
         ->paginate(20);
-
         if ($data->isEmpty()) {
             return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
         }
@@ -145,6 +146,29 @@ class ConstEstadoPOSTController extends Controller
     public function update(Request $request, string $id)
     {
         //
+       
+        $res = Postulacion::find($id);
+        if(isset($res)){
+            $res->CIInfPer = $request->CIInfPer;
+            $res->oferta_id = $request->oferta_id;
+            if($res->save()){
+                return response()->json([
+                    'data'=>$res,
+                    'mensaje'=>"Actualizado con Éxito!!",
+                ]);
+            }
+            else{
+                return response()->json([
+                    'error'=>true,
+                    'mensaje'=>"Error al Actualizar",
+                ]);
+            }
+        }else{
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>"La Postulación de Empleo con id: $id no Existe",
+            ]);
+        }
     }
 
     /**
@@ -152,6 +176,28 @@ class ConstEstadoPOSTController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $res = Postulacion::find($id);
+        if(isset($res)){
+            $elim = Postulacion::destroy($id);
+            if($elim){
+                return response()->json([
+                    'data'=>$res,
+                    'mensaje'=>"Eliminado con Éxito!!",
+                ]);
+            }else{
+                return response()->json([
+                    'data'=>$res,
+                    'mensaje'=>"La Oferta_Empleo no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+           
+           
+           
+        }else{
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>"La Oferta_Empleo con id: $id no Existe",
+            ]);
+        }
     }
 }

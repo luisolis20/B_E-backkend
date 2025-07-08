@@ -17,6 +17,7 @@ class Oferta_Empleo extends Model
         'tipo_contrato',
         'modalidad',
         'categoria',
+        'fechaFinOferta',
         'empresa_id',
     ];
 

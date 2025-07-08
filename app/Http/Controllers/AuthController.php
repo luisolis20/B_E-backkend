@@ -38,12 +38,14 @@ class AuthController extends Controller
         // Buscar en InformacionPersonal (Estudiante)
         $res = informacionpersonal::where('CIInfPer', $CIInfPer)->first();
         $resdocen = RegistroTitulos::where('ciinfper', $CIInfPer)->first();
+        $user = User::where('email', $CIInfPer)->first();
         if ($res) {
             if($resdocen){
 
                 if (md5($codigo_dactilar) !== $res->codigo_dactilar) {
                     return response()->json([
                         'error' => true,
+                        'clave' => 'clave error',
                         'mensaje' => 'Usuario correcto pero la clave es incorrecta',
                     ], Response::HTTP_UNAUTHORIZED);
                 }
@@ -73,71 +75,21 @@ class AuthController extends Controller
                     'token_type' => 'bearer'
                 ]);
             }else{
-                 $user2 = User::updateOrCreate(
-                    ['email' => $res->mailPer],
-                    [
-                        'name' => $res->ApellInfPer,
-                        'CIInfPer' => $res->CIInfPer,
-                        'password' => bcrypt($codigo_dactilar),
-                        'role' => 'Estudiante',
-                        'estado' => 1,
-                    ]
-                );
-        
-                $token2 = auth()->login($user2);
+                
                 return response()->json([
                     'mensaje' => 'El usuario estudiante aun no se ha graduado',
+                    'error' => true,
                     'Rol' => 'Estudiante',
                     'Graduado' => 'No',
                     'CIInfPer' => $res->CIInfPer,
                     'ApellInfPer' => $res->ApellInfPer,
                     'mailPer' => $res->mailPer,
-                    'token' => $token2,
-                    'token_type' => 'bearer'
                     
                 ]);
             }
         }
-        // Buscar en InformacionPersonald (Docente)
-       
-        /*if ($resdocen) {
-            if (md5($codigo_dactilar) !== $resdocen->ClaveUsu) {
-                return response()->json([
-                    'error' => true,
-                    'mensaje' => 'Usuario correcto pero la clave es incorrecta',
-                ], Response::HTTP_UNAUTHORIZED);
-            }
-    
-            // Crear o actualizar usuario en users_cvn
-            $user = User::updateOrCreate(
-                ['email' => $resdocen->mailPer],
-                [
-                    'name' => $resdocen->ApellInfPer,
-                    'CIInfPer' => $resdocen->CIInfPer,
-                    'password' => bcrypt($codigo_dactilar),
-                    'role' => 'Estudiante',
-                    'estado' => 1,
-                ]
-            );
-    
-            $token = auth()->login($user);
-    
-            return response()->json([
-                'mensaje' => 'Autenticación exitosa',
-                'Rol' => 'Docente',
-                'CIInfPer' => $resdocen->CIInfPer,
-                'ApellInfPer' => $resdocen->ApellInfPer,
-                'mailPer' => $resdocen->mailPer,
-                'token' => $token,
-                'token_type' => 'bearer'
-            ]);
-        }*/
-    
         
-    
-        // Buscar en tabla users_cvn directamente
-        $user = User::where('email', $CIInfPer)->first();
-        if ($user) {
+        elseif ($user) {
             if ($user->estado !== 1) {
                 return response()->json([
                     'error' => true,
@@ -165,12 +117,14 @@ class AuthController extends Controller
                 'CIInfPer' => $user->CIInfPer,
                 'Rol' => $user->role,
             ]);
+        }else{
+            
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El Usuario: $CIInfPer no Existe",
+            ], Response::HTTP_NOT_FOUND);
         }
     
-        return response()->json([
-            'error' => true,
-            'mensaje' => "El Usuario: $CIInfPer no Existe",
-        ], Response::HTTP_NOT_FOUND);
     }
    
     public function me(){

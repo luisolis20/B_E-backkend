@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EstadoPostulacion;
 use Illuminate\Http\Request;
 
-class ConstEstadoPOSTController extends Controller
+class ConstEstadoPOST2Controller extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +14,30 @@ class ConstEstadoPOSTController extends Controller
     {
         try{
 
-            $query= EstadoPostulacion::select('estado_postulaciones_be.*');
+            $query= EstadoPostulacion::select(
+            'estado_postulaciones_be.id',
+            'estado_postulaciones_be.postulacion_id',
+            'estado_postulaciones_be.estado',
+            'estado_postulaciones_be.fecha',
+            'estado_postulaciones_be.detalle_estado',
+            'postulacions_be.id as IDPostulacion',
+            'praempresa.idempresa as IDEmpresa',
+            'praempresa.empresacorta as Empresa',
+            'informacionpersonal.CIInfPer',
+            'informacionpersonal.ApellInfPer',
+            'informacionpersonal.ApellMatInfPer',
+            'informacionpersonal.NombInfPer',
+            'informacionpersonal.mailPer',
+            'informacionpersonal.CelularInfPer',
+            'informacionpersonal.DirecDomicilioPer',
+            'oferta__empleos_be.titulo as Oferta',
+            'oferta__empleos_be.id as IDOferta',
+            'estado_postulaciones_be.created_at'
+        )
+        ->join('postulacions_be', 'postulacions_be.id', '=', 'estado_postulaciones_be.postulacion_id')
+        ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
+        ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer');
             // Verificar si se solicita todos los datos sin paginación
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
@@ -90,6 +113,7 @@ class ConstEstadoPOSTController extends Controller
             'estado_postulaciones_be.estado',
             'estado_postulaciones_be.fecha',
             'estado_postulaciones_be.detalle_estado',
+            'postulacions_be.id as IDPostulacion',
             'praempresa.idempresa as IDEmpresa',
             'praempresa.empresacorta as Empresa',
             'informacionpersonal.CIInfPer',
@@ -107,7 +131,7 @@ class ConstEstadoPOSTController extends Controller
         ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
         ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
         ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
-        ->where('informacionpersonal.CIInfPer', $id)
+        ->where('postulacions_be.id', $id)
         ->paginate(20);
 
         if ($data->isEmpty()) {
