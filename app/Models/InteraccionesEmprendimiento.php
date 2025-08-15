@@ -7,15 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class InteraccionesEmprendimiento extends Model
 { 
-    protected $table = 'interacciones_emprendimientos';
+    protected $table = 'be_interacciones_emprendimientos';
     protected $primaryKey = 'id';
-    public $timestamps = false;
 
     protected $fillable = [
         'CIInfPer',
         'emprendimiento_id',
-        'tipo_interaccion',
-        'fecha_interaccion'
     ];
 
     public function emprendimiento()
