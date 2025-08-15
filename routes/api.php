@@ -6,6 +6,7 @@ use App\Http\Controllers\ConstPostUsersController;
 use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\Oferta_EmpleoController;
+use App\Http\Controllers\EmprendimientosController;
 use App\Http\Controllers\PostulacionController;
 use App\Http\Controllers\Postulacion2Controller;
 use App\Http\Controllers\UserController;
@@ -44,6 +45,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource("vin/empresas",EmpresaController::class);
     Route::apiResource("vin/users",UserController::class);
     Route::apiResource("vin/oferta__empleos",Oferta_EmpleoController::class);
+    Route::apiResource("vin/emprendimientos",EmprendimientosController::class);
     Route::apiResource("vin/oferta__empleos2",Oferta_Empleo2Controller::class);
     Route::apiResource("vin/postulacions",PostulacionController::class);
     Route::apiResource("vin/postulacions2",Postulacion2Controller::class);

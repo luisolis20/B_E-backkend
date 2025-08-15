@@ -90,6 +90,10 @@ class informacionpersonal extends Model
     {
         return $this->hasMany(Postulacion::class, 'CIInfPer');
     }
+    public function emprendimientos()
+    {
+        return $this->hasMany(Emprendimientos::class, 'CIInfPer');
+    }
     public function registrotitulos()
     {
         return $this->hasMany(RegistroTitulos::class, 'CIInfPer');
