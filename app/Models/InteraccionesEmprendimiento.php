@@ -24,4 +24,8 @@ class InteraccionesEmprendimiento extends Model
     {
         return $this->belongsTo(InformacionPersonal::class, 'CIInfPer', 'CIInfPer');
     }
+    public function estadosPostulacion()
+    {
+        return $this->hasMany(EstadoPostulacion::class, 'interaccion_id', 'id');
+    }
 }
