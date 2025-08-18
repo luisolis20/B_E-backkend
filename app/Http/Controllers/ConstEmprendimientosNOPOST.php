@@ -26,7 +26,8 @@ class ConstEmprendimientosNOPOST extends Controller
             // Si no hay interacciones, mostrar todos los emprendimientos
             $emprendimientos = Emprendimientos::select(
                     'be_emprendimientos.id',
-                    'be_emprendimientos.nombre',
+                    'be_emprendimientos.ruc',
+                    'be_emprendimientos.nombre_emprendimiento',
                     'be_emprendimientos.descripcion',
                     'be_emprendimientos.fotografia',
                     'be_emprendimientos.tiempo_emprendimiento',
@@ -70,7 +71,8 @@ class ConstEmprendimientosNOPOST extends Controller
             // Mostrar solo los emprendimientos que el usuario NO haya visitado/postulado
             $emprendimientos = Emprendimientos::select(
                     'be_emprendimientos.id',
-                    'be_emprendimientos.nombre',
+                    'be_emprendimientos.ruc',
+                    'be_emprendimientos.nombre_emprendimiento',
                     'be_emprendimientos.descripcion',
                     'be_emprendimientos.fotografia',
                     'be_emprendimientos.tiempo_emprendimiento',

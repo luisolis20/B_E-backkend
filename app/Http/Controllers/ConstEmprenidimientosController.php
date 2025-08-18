@@ -47,6 +47,7 @@ class ConstEmprenidimientosController extends Controller
     {
         $res = Emprendimientos::select('be_emprendimientos.id',
             'be_emprendimientos.CIInfPer',
+            'be_emprendimientos.ruc',
             'be_emprendimientos.nombre_emprendimiento',
             'be_emprendimientos.descripcion',
             'be_emprendimientos.tiempo_emprendimiento',

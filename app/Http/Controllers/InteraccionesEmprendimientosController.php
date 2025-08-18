@@ -20,6 +20,7 @@ class InteraccionesEmprendimientosController extends Controller
                 'informacionpersonal.NombInfPer',
                 'informacionpersonal.mailPer',
                 'be_emprendimientos.nombre_emprendimiento',
+                'be_emprendimientos.ruc',
                 'be_emprendimientos.descripcion',
                 'be_emprendimientos.categoria',
                 'be_interacciones_emprendimientos.created_at'
@@ -94,6 +95,7 @@ class InteraccionesEmprendimientosController extends Controller
             'informacionpersonal.NombInfPer',
             'informacionpersonal.mailPer',
             'be_emprendimientos.nombre_emprendimiento',
+            'be_emprendimientos.ruc',
             'be_emprendimientos.descripcion',
             'be_emprendimientos.categoria',
             'be_interacciones_emprendimientos.created_at'

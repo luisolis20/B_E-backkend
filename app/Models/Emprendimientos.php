@@ -15,6 +15,7 @@ class Emprendimientos extends Model
 
     // Campos que se pueden asignar de forma masiva
     protected $fillable = [
+        'ruc',
         'CIInfPer',
         'nombre_emprendimiento',
         'descripcion',

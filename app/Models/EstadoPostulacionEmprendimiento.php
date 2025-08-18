@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class EstadoPostulacion extends Model
+class EstadoPostulacionEmprendimiento extends Model
 {
     use HasFactory;
     // Nombre de la tabla
