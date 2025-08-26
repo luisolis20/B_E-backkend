@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Emprendimientos;
+use App\Models\Oferta_Empleo_Empre;
 use Illuminate\Http\Request;
 
-class Emprendimientos2Controller extends Controller
+class Oferta_Emprendimientos2Controller extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,8 +27,8 @@ class Emprendimientos2Controller extends Controller
      */
     public function show(string $id)
     {
-        $res = Emprendimientos::select('be_emprendimientos.*')
-        ->where('be_emprendimientos.id', $id)
+        $res = Oferta_Empleo_Empre::select('be_oferta_empleos_empre.*')
+        ->where('be_oferta_empleos_empre.id', $id)
         ->get();
         if ($res) {
             return response()->json([
@@ -48,7 +48,7 @@ class Emprendimientos2Controller extends Controller
      */
     public function update(Request $request, string $id)
     {
-         $res = Emprendimientos::find($id);
+         $res = Oferta_Empleo_Empre::find($id);
 
         if ($res) {
             $res->update($request->all());
@@ -70,9 +70,9 @@ class Emprendimientos2Controller extends Controller
      */
     public function destroy(string $id)
     {
-        $res = Emprendimientos::find($id);
+        $res = Oferta_Empleo_Empre::find($id);
         if(isset($res)){
-            $elim = Emprendimientos::destroy($id);
+            $elim = Oferta_Empleo_Empre::destroy($id);
             if($elim){
                 return response()->json([
                     'data'=>$res,

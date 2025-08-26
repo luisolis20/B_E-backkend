@@ -1,17 +1,19 @@
 <?php
 
 use App\Http\Controllers\ConstOfertController;
-use App\Http\Controllers\ConstEmprenidimientosController;//Emprendimiento
+use App\Http\Controllers\ConstOfertEmprenidimientosController;//Emprendimiento
 use App\Http\Controllers\ConstPostuController;
 use App\Http\Controllers\ConstEmprendimientoPostuController;//Emprendimiento
 use App\Http\Controllers\ConstPostUsersController;
 use App\Http\Controllers\ConstEmprendimientoPostUsersController;//Emprendimiento
 use App\Http\Controllers\ConsultaController;
+use App\Http\Controllers\ConsultaControllerEmprendimiento;//Emprendimiento
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\EmprendimientosEController;//Emprendimiento
 use App\Http\Controllers\Oferta_EmpleoController;
-use App\Http\Controllers\EmprendimientosController;//Emprendimiento
+use App\Http\Controllers\Oferta_EmprendimientosController;//Emprendimiento
 use App\Http\Controllers\PostulacionController;
-use App\Http\Controllers\InteraccionesEmprendimientosController;// Interacciones Emprendimientos
+use App\Http\Controllers\PostulacionEmprendimientosController;// Interacciones Emprendimientos
 use App\Http\Controllers\Postulacion2Controller;
 use App\Http\Controllers\InteraccionesEmprendimientos2Controller;// Interacciones Emprendimientos
 use App\Http\Controllers\UserController;
@@ -33,7 +35,7 @@ use App\Http\Controllers\ConstEmprendimientoPostUsersEstadoController;//Emprendi
 use App\Http\Controllers\ConstPostUsersEstado2Controller;
 use App\Http\Controllers\ConstEmprendimientoPostUsersEstado2Controller;//Emprendimiento
 use App\Http\Controllers\Oferta_Empleo2Controller;
-use App\Http\Controllers\Emprendimientos2Controller;
+use App\Http\Controllers\Oferta_Emprendimientos2Controller;
 use App\Http\Controllers\EnviarComentarioController;
 use App\Http\Controllers\AuthController;
 
@@ -54,13 +56,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('b_e')->group(function () {
 
     Route::apiResource("vin/empresas",EmpresaController::class);
+    Route::apiResource("vin/emprendimientos_E",EmprendimientosEController::class);
     Route::apiResource("vin/users",UserController::class);
     Route::apiResource("vin/oferta__empleos",Oferta_EmpleoController::class);
-    Route::apiResource("vin/emprendimientos",EmprendimientosController::class);//Emprendimiento
+    Route::apiResource("vin/oferta_empleos_emprendimiento",Oferta_EmprendimientosController::class);//Emprendimiento
     Route::apiResource("vin/oferta__empleos2",Oferta_Empleo2Controller::class);
-    Route::apiResource("vin/emprendimientos2",Emprendimientos2Controller::class);//Emprendimiento
+    Route::apiResource("vin/oferta_empleos_emprendimientos2",Oferta_Emprendimientos2Controller::class);//Emprendimiento
     Route::apiResource("vin/postulacions",PostulacionController::class);
-    Route::apiResource("vin/interaccionempren",InteraccionesEmprendimientosController::class);// Interacciones Emprendimientos
+    Route::apiResource("vin/postulacionemprendi",PostulacionEmprendimientosController::class);// Interacciones Emprendimientos
     Route::apiResource("vin/postulacions2",Postulacion2Controller::class);
     Route::apiResource("vin/postulacions2empre",InteraccionesEmprendimientos2Controller::class);// Interacciones Emprendimientos
     Route::post('vin/enviar-comentario', [EnviarComentarioController::class, 'enviarComentario']);
@@ -68,6 +71,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource('vin/informacionpersonal', InformacionPersonalController::class);
     Route::apiResource('vin/registrotitulos', RegistroTituloController::class);
     Route::apiResource('vin/consultaredir',ConsultaController::class);
+    Route::apiResource('vin/consultarediremp',ConsultaControllerEmprendimiento::class);
     Route::apiResource('vin/consultapost',ConstPostuController::class);
     Route::apiResource('vin/consultapostempr',ConstEmprendimientoPostuController::class);//Emprendimiento 
     Route::apiResource('vin/consultapostuser',ConstPostUsersController::class);
@@ -77,7 +81,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource('vin/consultapostuserestado2',ConstPostUsersEstado2Controller::class);
     Route::apiResource('vin/consultapostuserestado2empr',ConstEmprendimientoPostUsersEstado2Controller::class);
     Route::apiResource('vin/consultaofert',ConstOfertController::class);
-    Route::apiResource('vin/consultaempr',ConstEmprenidimientosController::class);//Emprendimiento
+    Route::apiResource('vin/consultaofertempr',ConstOfertEmprenidimientosController::class);//Emprendimiento
     Route::apiResource('vin/consultanopostofert',ConstOfertasNOPOST::class);
     Route::apiResource('vin/consultanopostempre',ConstEmprendimientosNOPOST::class);//Emprendimiento
     Route::apiResource('vin/estadopostuser',ConstEstadoPOSTController::class);

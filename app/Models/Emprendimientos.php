@@ -9,7 +9,6 @@ class Emprendimientos extends Model
 {
    // Nombre de la tabla en la base de datos
     protected $table = 'be_emprendimientos';
-
     // Clave primaria
     protected $primaryKey = 'id';
 
@@ -23,19 +22,13 @@ class Emprendimientos extends Model
         'tiempo_emprendimiento',
         'horarios_atencion',
         'direccion',
-        'fecha_caducidad_oferta_emprend',
-        'categoria',
         'telefono_contacto',
         'email_contacto',
         'sitio_web',
-        'redes_sociales'
+        'redes_sociales',
+        'estado_empren'
     ];
 
-    protected $dates = [
-        'fecha_caducidad_oferta_emprend',
-        'created_at',
-        'updated_at'
-    ];
 
     // Relación con la tabla informacionpersonal
     public function informacionPersonal()

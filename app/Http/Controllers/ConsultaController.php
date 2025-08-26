@@ -5,7 +5,7 @@ use App\Models\Empresa;
 use Illuminate\Http\Request;
 
 class ConsultaController extends Controller
-{
+{ 
     /**
      * Display a listing of the resource.
      */

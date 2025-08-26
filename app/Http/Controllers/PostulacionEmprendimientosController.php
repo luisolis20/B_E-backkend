@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\InteraccionesEmprendimiento;
+use App\Models\PostulacionesEmprendimiento;
 use Illuminate\Http\Request;
 
-class InteraccionesEmprendimientosController extends Controller
+class PostulacionEmprendimientosController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -12,21 +12,25 @@ class InteraccionesEmprendimientosController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = InteraccionesEmprendimiento::select(
-                'be_interacciones_emprendimientos.id',
+            $query = PostulacionesEmprendimiento::select(
+                'be_postulacions_empren.id',
+                'be_emprendimientos.nombre_emprendimiento as Empresa',
+                'be_oferta_empleos_empre.titulo as Oferta',
+                'be_oferta_empleos_empre.descripcion',
                 'informacionpersonal.CIInfPer',
                 'informacionpersonal.ApellInfPer',
                 'informacionpersonal.ApellMatInfPer',
                 'informacionpersonal.NombInfPer',
                 'informacionpersonal.mailPer',
-                'be_emprendimientos.nombre_emprendimiento',
-                'be_emprendimientos.ruc',
-                'be_emprendimientos.descripcion',
-                'be_emprendimientos.categoria',
-                'be_interacciones_emprendimientos.created_at'
+                'informacionpersonal.fotografia',
+                'estado_postulaciones_be.estado',
+                'estado_postulaciones_be.detalle_estado',
+                'be_postulacions_empren.created_at'
             )
-            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
-            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer');
+            ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+            ->join('estado_postulaciones_be', 'estado_postulaciones_be.postulacion_id', '=', 'be_postulacions_empren.id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer');
 
             // Si se solicita todo sin paginar
             if ($request->has('all') && $request->all === 'true') {
@@ -75,7 +79,7 @@ class InteraccionesEmprendimientosController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        $res = InteraccionesEmprendimiento::create($inputs);
+        $res = PostulacionesEmprendimiento::create($inputs);
         return response()->json([
             'data'=>$res,
             'mensaje'=>"Agregado con Éxito!!",
@@ -87,22 +91,23 @@ class InteraccionesEmprendimientosController extends Controller
      */
     public function show(string $id)
     {
-        $data = InteraccionesEmprendimiento::select(
-            'be_interacciones_emprendimientos.id',
+        $data = PostulacionesEmprendimiento::select(
+            'be_postulacions_empren.id',
+            'be_emprendimientos.nombre_emprendimiento as Empresa',
+            'be_oferta_empleos_empre.titulo as Oferta',
+            'be_oferta_empleos_empre.descripcion',
             'informacionpersonal.CIInfPer',
             'informacionpersonal.ApellInfPer',
             'informacionpersonal.ApellMatInfPer',
             'informacionpersonal.NombInfPer',
             'informacionpersonal.mailPer',
-            'be_emprendimientos.nombre_emprendimiento',
-            'be_emprendimientos.ruc',
-            'be_emprendimientos.descripcion',
-            'be_emprendimientos.categoria',
-            'be_interacciones_emprendimientos.created_at'
+            'informacionpersonal.fotografia',
+            'be_postulacions_empren.created_at'
         )
-        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer')
-        ->where('be_emprendimientos.id', $id)
+        ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
+        ->where('be_oferta_empleos_empre.id', $id)
         ->paginate(20);
 
         if ($data->isEmpty()) {
@@ -134,10 +139,10 @@ class InteraccionesEmprendimientosController extends Controller
     {
         //
        
-        $res = InteraccionesEmprendimiento::find($id);
+        $res = PostulacionesEmprendimiento::find($id);
         if(isset($res)){
             $res->CIInfPer = $request->CIInfPer;
-            $res->emprendimiento_id = $request->emprendimiento_id;
+             $res->oferta_emp_id = $request->oferta_emp_id;
             if($res->save()){
                 return response()->json([
                     'data'=>$res,
@@ -163,9 +168,9 @@ class InteraccionesEmprendimientosController extends Controller
      */
     public function destroy(string $id)
     {
-        $res = InteraccionesEmprendimiento::find($id);
+        $res = PostulacionesEmprendimiento::find($id);
         if(isset($res)){
-            $elim = InteraccionesEmprendimiento::destroy($id);
+            $elim = PostulacionesEmprendimiento::destroy($id);
             if($elim){
                 return response()->json([
                     'data'=>$res,

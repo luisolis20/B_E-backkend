@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Emprendimientos;
+use App\Models\Oferta_Empleo_Empre;
 use Illuminate\Http\Request;
 
-class EmprendimientosController extends Controller
+class Oferta_EmprendimientosController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +13,7 @@ class EmprendimientosController extends Controller
     {
         try{
 
-            $query =  Emprendimientos::select('be_emprendimientos.*');
+            $query =  Oferta_Empleo_Empre::select('be_oferta_empleos_empre.*');
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
 
@@ -68,7 +68,7 @@ class EmprendimientosController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        $res = Emprendimientos::create($inputs);
+        $res = Oferta_Empleo_Empre::create($inputs);
         return response()->json([
             'data'=>$res,
             'mensaje'=>"Agregado con Éxito!!",
@@ -80,8 +80,10 @@ class EmprendimientosController extends Controller
      */
     public function show(string $id)
     {
-        $data = Emprendimientos::where('CIInfPer', $id)
-        ->select('be_emprendimientos.*')
+        $data = Oferta_Empleo_Empre::join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer')
+        ->where('informacionpersonal.CIInfPer', $id)
+        ->select('be_oferta_empleos_empre.*')
         ->paginate(20);
 
         if ($data->isEmpty()) {
@@ -119,19 +121,19 @@ class EmprendimientosController extends Controller
      */
     public function update(Request $request, string $id)
     {
-         $res = Emprendimientos::find($id);
+         $res = Oferta_Empleo_Empre::find($id);
 
         if ($res) {
             $res->update($request->all());
 
             return response()->json([
                 'data' => $res,
-                'mensaje' => "Emprendimiento actualizado con éxito!",
+                'mensaje' => "Actualizado con Éxito!!",
             ]);
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El emprendimiento con id: $id no existe",
+                'mensaje' => "La Oferta de Empleo con id: $id no existe",
             ]);
         }
     }
@@ -141,25 +143,25 @@ class EmprendimientosController extends Controller
      */
     public function destroy(string $id)
     {
-       $res = Emprendimientos::find($id);
+       $res = Oferta_Empleo_Empre::find($id);
 
         if ($res) {
-            $elim = Emprendimientos::destroy($id);
+            $elim = Oferta_Empleo_Empre::destroy($id);
             if ($elim) {
                 return response()->json([
                     'data' => $res,
-                    'mensaje' => "Emprendimiento eliminado con éxito!",
+                    'mensaje' => "Eliminado con Éxito!!",
                 ]);
             } else {
                 return response()->json([
                     'data' => $res,
-                    'mensaje' => "El emprendimiento no existe o ya fue eliminado",
+                    'mensaje' => "La Oferta_Empleo no existe (puede que ya la haya eliminado)",
                 ]);
             }
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El emprendimiento con id: $id no existe",
+                'mensaje' => "La Oferta_Empleo con id: $id no Existe",
             ]);
         }
     }
