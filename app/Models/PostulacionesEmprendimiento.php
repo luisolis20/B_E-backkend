@@ -26,6 +26,6 @@ class PostulacionesEmprendimiento extends Model
     }
     public function estadosPostulacion()
     {
-        return $this->hasMany(EstadoPostulacionEmprendimiento::class, 'interaccion_id', 'id');
+        return $this->hasMany(EstadoPostulacionEmprendimiento::class, 'postulacion_empren_id', 'id');
     }
 }

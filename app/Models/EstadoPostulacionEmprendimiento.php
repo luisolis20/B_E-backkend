@@ -13,7 +13,7 @@ class EstadoPostulacionEmprendimiento extends Model
 
     // Campos que pueden ser llenados masivamente
     protected $fillable = [
-        'interaccion_id',
+        'postulacion_empren_id',
         'estado',
         'detalle_estado',
         'fecha',
@@ -25,6 +25,6 @@ class EstadoPostulacionEmprendimiento extends Model
      */
     public function postulacion()
     {
-        return $this->belongsTo(InteraccionesEmprendimiento::class, 'interaccion_id');
+        return $this->belongsTo(PostulacionesEmprendimiento::class, 'postulacion_empren_id');
     }
 }
