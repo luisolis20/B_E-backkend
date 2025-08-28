@@ -45,7 +45,10 @@ class EmprendimientosEController extends Controller
             $data->getCollection()->transform(function ($item) {
                 $attributes = $item->getAttributes();
                 foreach ($attributes as $key => $value) {
-                    if (is_string($value)) {
+                    if ($key === 'fotografia' && !empty($value)) {
+                        // ✅ Convertir BLOB a base64
+                        $attributes[$key] = base64_encode($value);
+                    } elseif (is_string($value) && $key !== 'fotografia') {
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
@@ -94,7 +97,7 @@ class EmprendimientosEController extends Controller
     {
         $data =  Emprendimientos::join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer')
             ->where('informacionpersonal.CIInfPer', $id)
-            ->select('be_emprendimientos.*', 'informacionpersonal.ApellInfPer', 'informacionpersonal.ApellMatInfPer','informacionpersonal.NombInfPer')
+            ->select('be_emprendimientos.*', 'informacionpersonal.ApellInfPer', 'informacionpersonal.ApellMatInfPer', 'informacionpersonal.NombInfPer')
             ->paginate(20);
         if ($data->isEmpty()) {
             return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
@@ -104,7 +107,10 @@ class EmprendimientosEController extends Controller
         $data->getCollection()->transform(function ($item) {
             $attributes = $item->getAttributes();
             foreach ($attributes as $key => $value) {
-                if (is_string($value)) {
+                if ($key === 'fotografia' && !empty($value)) {
+                    // ✅ Convertir BLOB a base64
+                    $attributes[$key] = base64_encode($value);
+                } elseif (is_string($value) && $key !== 'fotografia') {
                     $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                 }
             }
@@ -138,7 +144,7 @@ class EmprendimientosEController extends Controller
             $res->descripcion = $request->descripcion;
             if (!empty($res->fotografia)) {
                 $res->fotografia = base64_decode($res->fotografia);
-            }else{
+            } else {
                 $res->fotografia = null;
             }
             $res->tiempo_emprendimiento = $request->tiempo_emprendimiento;
@@ -150,7 +156,7 @@ class EmprendimientosEController extends Controller
             $res->redes_sociales = $request->redes_sociales;
             $res->estado_empren = $request->estado_empren;
             if ($res->save()) {
-                 $data = $res->toArray();
+                $data = $res->toArray();
                 if (!empty($res->fotografia)) {
                     $data['fotografia'] = base64_encode($res->fotografia);
                 }
