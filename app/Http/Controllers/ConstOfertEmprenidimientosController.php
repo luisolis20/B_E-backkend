@@ -14,7 +14,7 @@ class ConstOfertEmprenidimientosController extends Controller
     {
         try {
 
-            $res = Oferta_Empleo_Empre::select(
+            $data = Oferta_Empleo_Empre::select(
                 'be_oferta_empleos_empre.id',
                 'be_oferta_empleos_empre.emprendimiento_id',
                 'be_emprendimientos.nombre_emprendimiento as Empresa',
@@ -31,19 +31,35 @@ class ConstOfertEmprenidimientosController extends Controller
                 'informacionpersonal.NombInfPer',
                 'be_oferta_empleos_empre.created_at'
             )
-            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
-            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
-            ->get();
-            if ($res) {
-                $data = $res->toArray();
-                if (!empty($res->fotografia)) {
-                    $data['fotografia'] = base64_encode($res->fotografia);
-                }
-                return response()->json([
-                    'data' => $data,
-                    'mensaje' => "Encontrado con Éxito!!",
-                ]);
+                ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+                ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
+                ->paginate(20);
+            if ($data->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
             }
+
+            // Convertir los campos a UTF-8 válido para cada página
+            $data->getCollection()->transform(function ($item) {
+                $attributes = $item->getAttributes();
+                foreach ($attributes as $key => $value) {
+                    if ($key === 'fotografia' && !empty($value)) {
+                        // ✅ Convertir BLOB a base64
+                        $attributes[$key] = base64_encode($value);
+                    } elseif (is_string($value) && $key !== 'fotografia') {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+                return $attributes;
+            });
+
+
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al obtener los datos: ' . $e->getMessage()], 500);
         }
@@ -62,16 +78,17 @@ class ConstOfertEmprenidimientosController extends Controller
      */
     public function show(string $id)
     {
-        try{
+        try {
 
-            $res = Oferta_Empleo_Empre::select(
+            $data = Oferta_Empleo_Empre::select(
                 'be_oferta_empleos_empre.id',
                 'be_oferta_empleos_empre.emprendimiento_id',
                 'be_emprendimientos.nombre_emprendimiento as Empresa',
                 'be_emprendimientos.fotografia',
-                'be_emprendimientos.lugar',
-                'be_emprendimientos.telefono',
+                'be_emprendimientos.telefono_contacto',
                 'be_emprendimientos.direccion',
+                'be_emprendimientos.sitio_web',
+                'be_emprendimientos.redes_sociales',
                 'be_oferta_empleos_empre.titulo',
                 'be_oferta_empleos_empre.descripcion',
                 'be_oferta_empleos_empre.categoria',
@@ -85,28 +102,38 @@ class ConstOfertEmprenidimientosController extends Controller
                 'informacionpersonal.NombInfPer',
                 'be_oferta_empleos_empre.created_at'
             )
-            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
-            ->join('be_users', 'be_users.id', '=', 'be_emprendimientos.usuario_id')
-            ->where('be_oferta_empleos_empre.id', $id)
-            ->get();
-    
-            if ($res) {
-                $data = $res->toArray();
-                if (!empty($res->fotografia)) {
-                    $data['fotografia'] = base64_encode($res->fotografia);
-                }
-                return response()->json([
-                    'data' => $data,
-                    'mensaje' => "Encontrado con Éxito!!",
-                ]);
-            } else {
-                return response()->json([
-                    'error' => true,
-                    'mensaje' => "La Oferta de Empleo no Existe",
-                ]);
+                ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+                ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer')
+                ->where('be_oferta_empleos_empre.id', $id)
+                ->paginate(20);
+            if ($data->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
             }
-        }catch(\Exception $e){
-            return response()->json(['error' => 'Error al obtener los datos: ' . $e->getMessage()], 500);
+
+            // Convertir los campos a UTF-8 válido para cada página
+            $data->getCollection()->transform(function ($item) {
+                $attributes = $item->getAttributes();
+                foreach ($attributes as $key => $value) {
+                    if ($key === 'fotografia' && !empty($value)) {
+                        // ✅ Convertir BLOB a base64
+                        $attributes[$key] = base64_encode($value);
+                    } elseif (is_string($value) && $key !== 'fotografia') {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+                return $attributes;
+            });
+
+
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
 

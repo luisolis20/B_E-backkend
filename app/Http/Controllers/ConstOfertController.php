@@ -12,12 +12,23 @@ class ConstOfertController extends Controller
      */
     public function index()
     {
-        return Oferta_Empleo::select('oferta__empleos_be.id','oferta__empleos_be.empresa_id','praempresa.empresacorta as Empresa', 'oferta__empleos_be.titulo',
-         'oferta__empleos_be.descripcion','oferta__empleos_be.categoria', 'oferta__empleos_be.requisistos as Requisitos','oferta__empleos_be.jornada',
-         'oferta__empleos_be.modalidad','oferta__empleos_be.tipo_contrato', 'praempresa.representante as Jefe','oferta__empleos_be.created_at')
-        ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-        ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
-        ->get();
+        return Oferta_Empleo::select(
+            'oferta__empleos_be.id',
+            'oferta__empleos_be.empresa_id',
+            'praempresa.empresacorta as Empresa',
+            'oferta__empleos_be.titulo',
+            'oferta__empleos_be.descripcion',
+            'oferta__empleos_be.categoria',
+            'oferta__empleos_be.requisistos as Requisitos',
+            'oferta__empleos_be.jornada',
+            'oferta__empleos_be.modalidad',
+            'oferta__empleos_be.tipo_contrato',
+            'praempresa.representante as Jefe',
+            'oferta__empleos_be.created_at'
+        )
+            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+            ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+            ->get();
     }
 
     /**
@@ -33,14 +44,28 @@ class ConstOfertController extends Controller
      */
     public function show(string $id)
     {
-        $res = Oferta_Empleo::select('oferta__empleos_be.id','oferta__empleos_be.empresa_id','praempresa.empresacorta as Empresa','praempresa.lugar', 'praempresa.telefono',
-        'praempresa.direccion',
-        'oferta__empleos_be.titulo', 'oferta__empleos_be.descripcion','oferta__empleos_be.categoria','oferta__empleos_be.fechaFinOferta','oferta__empleos_be.jornada','oferta__empleos_be.modalidad',
-        'oferta__empleos_be.tipo_contrato', 'oferta__empleos_be.requisistos as Requisitos', 'praempresa.representante as Jefe','oferta__empleos_be.created_at')
-        ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-        ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
-        ->where('oferta__empleos_be.id', $id)
-        ->get();
+        $res = Oferta_Empleo::select(
+            'oferta__empleos_be.id',
+            'oferta__empleos_be.empresa_id',
+            'praempresa.empresacorta as Empresa',
+            'praempresa.lugar',
+            'praempresa.telefono',
+            'praempresa.direccion',
+            'oferta__empleos_be.titulo',
+            'oferta__empleos_be.descripcion',
+            'oferta__empleos_be.categoria',
+            'oferta__empleos_be.fechaFinOferta',
+            'oferta__empleos_be.jornada',
+            'oferta__empleos_be.modalidad',
+            'oferta__empleos_be.tipo_contrato',
+            'oferta__empleos_be.requisistos as Requisitos',
+            'praempresa.representante as Jefe',
+            'oferta__empleos_be.created_at'
+        )
+            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+            ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+            ->where('oferta__empleos_be.id', $id)
+            ->get();
 
         if ($res) {
             return response()->json([

@@ -11,10 +11,10 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
+    { 
         try{
 
-            $query= EstadoPostulacionEmprendimiento::select('be_estado_postulaciones_emprendimientos.*');
+            $query= EstadoPostulacionEmprendimiento::select('be_estado_postulaciones_emprend.*');
             // Verificar si se solicita todos los datos sin paginación
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
@@ -85,11 +85,11 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
     public function show(string $id)
     {
         $data = EstadoPostulacionEmprendimiento::select(
-            'be_estado_postulaciones_emprendimientos.id',
-            'be_estado_postulaciones_emprendimientos.interaccion_id',
-            'be_estado_postulaciones_emprendimientos.estado',
-            'be_estado_postulaciones_emprendimientos.detalle_estado',
-            'be_estado_postulaciones_emprendimientos.fecha',
+            'be_estado_postulaciones_emprend.id',
+            'be_estado_postulaciones_emprend.interaccion_id',
+            'be_estado_postulaciones_emprend.estado',
+            'be_estado_postulaciones_emprend.detalle_estado',
+            'be_estado_postulaciones_emprend.fecha',
             'informacionpersonal.CIInfPer',
             'informacionpersonal.ApellInfPer',
             'informacionpersonal.ApellMatInfPer',
@@ -100,9 +100,9 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
             'be_emprendimientos.nombre as NombreEmprendimiento',
             'be_emprendimientos.ruc',
             'be_emprendimientos.id as IDEmprendimiento',
-            'be_estado_postulaciones_emprendimientos.created_at'
+            'be_estado_postulaciones_emprend.created_at'
         )
-        ->join('be_interacciones_emprendimientos', 'be_interacciones_emprendimientos.id', '=', 'be_estado_postulaciones_emprendimientos.interaccion_id')
+        ->join('be_interacciones_emprendimientos', 'be_interacciones_emprendimientos.id', '=', 'be_estado_postulaciones_emprend.interaccion_id')
         ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
         ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer')
         ->where('informacionpersonal.CIInfPer', $id)

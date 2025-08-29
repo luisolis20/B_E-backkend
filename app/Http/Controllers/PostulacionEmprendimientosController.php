@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class PostulacionEmprendimientosController extends Controller
 {
-    /**
+    /** 
      * Display a listing of the resource.
      */
     public function index(Request $request)

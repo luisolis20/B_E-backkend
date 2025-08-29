@@ -9,7 +9,7 @@ class EstadoPostulacionEmprendimiento extends Model
 {
     use HasFactory;
     // Nombre de la tabla
-    protected $table = 'be_estado_postulaciones_emprendimientos';
+    protected $table = 'be_estado_postulaciones_emprend';
 
     // Campos que pueden ser llenados masivamente
     protected $fillable = [

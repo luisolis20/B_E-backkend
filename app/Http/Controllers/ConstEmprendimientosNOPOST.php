@@ -15,124 +15,75 @@ class ConstEmprendimientosNOPOST extends Controller
      */
     public function index(Request $request)
     {
-        $userId = $request->user_id; // El ID del usuario debe enviarse desde el frontend
+        $userId = $request->CIInfPer; // El ID del usuario enviado desde el frontend
 
-        // Verificar si el usuario tiene alguna interacción previa con un emprendimiento
+        // Verificar interacciones previas
         $interacciones = PostulacionesEmprendimiento::select('be_postulacions_empren.*')
             ->where('CIInfPer', $userId)
             ->pluck('oferta_emp_id')
             ->toArray();
 
-        if (empty($interacciones)) {
-            // Si no hay interacciones, mostrar todos los emprendimientos
-            $emprendimientos = Oferta_Empleo_Empre::select(
-                'be_oferta_empleos_empre.id',
-                'be_oferta_empleos_empre.emprendimiento_id',
-                'be_emprendimientos.nombre_emprendimiento as Empresa',
-                'be_emprendimientos.fotografia',
-                'be_oferta_empleos_empre.titulo',
-                'be_oferta_empleos_empre.descripcion',
-                'be_oferta_empleos_empre.categoria',
-                'be_oferta_empleos_empre.fechaFinOferta',
-                'be_oferta_empleos_empre.requisistos as Requisitos',
-                'be_oferta_empleos_empre.jornada',
-                'be_oferta_empleos_empre.modalidad',
-                'be_oferta_empleos_empre.tipo_contrato',
-                'informacionpersonal.ApellInfPer',
-                'informacionpersonal.ApellMatInfPer',
-                'informacionpersonal.NombInfPer',
-                'be_emprendimientos.CIInfPer',
-                'be_oferta_empleos_empre.created_at'
-            )
-                ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
-                ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer');
+        // Query base con exclusión de ofertas de emprendimientos propios
+        $emprendimientos = Oferta_Empleo_Empre::select(
+            'be_oferta_empleos_empre.id',
+            'be_oferta_empleos_empre.emprendimiento_id',
+            'be_emprendimientos.nombre_emprendimiento as Empresa',
+            'be_emprendimientos.fotografia',
+            'be_oferta_empleos_empre.titulo',
+            'be_oferta_empleos_empre.descripcion',
+            'be_oferta_empleos_empre.categoria',
+            'be_oferta_empleos_empre.fechaFinOferta',
+            'be_oferta_empleos_empre.requisistos as Requisitos',
+            'be_oferta_empleos_empre.jornada',
+            'be_oferta_empleos_empre.modalidad',
+            'be_oferta_empleos_empre.tipo_contrato',
+            'informacionpersonal.ApellInfPer',
+            'informacionpersonal.ApellMatInfPer',
+            'informacionpersonal.NombInfPer',
+            'be_emprendimientos.CIInfPer',
+            'be_oferta_empleos_empre.created_at'
+        )
+            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer')
+            ->where('be_emprendimientos.CIInfPer', '!=', $userId); // 👈 no mostrar si es dueño
 
-            if ($request->has('all') && $request->all === 'true') {
-                $data = $emprendimientos->get();
-                $data->transform(function ($item) {
-                    $attributes = $item->getAttributes();
-                    foreach ($attributes as $key => $value) {
-                        if ($key === 'fotografia' && !empty($value)) {
-                            // ✅ Convertir BLOB a base64
-                            $attributes[$key] = base64_encode($value);
-                        } elseif (is_string($value) && $key !== 'fotografia') {
-                            $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-                        }
-                    }
-                    return $attributes;
-                });
-                return response()->json(['data' => $data]);
-            }
-
-            $data = $emprendimientos->paginate(20);
-            if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
-            }
-            $data->getCollection()->transform(function ($item) {
-                $attributes = $item->getAttributes();
-                foreach ($attributes as $key => $value) {
-                    if (is_string($value)) {
-                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-                    }
-                }
-                return $attributes;
-            });
-        } else {
-            // Mostrar solo los emprendimientos que el usuario NO haya visitado/postulado
-            $emprendimientos = Oferta_Empleo_Empre::select(
-                'be_oferta_empleos_empre.id',
-                'be_oferta_empleos_empre.emprendimiento_id',
-                'be_emprendimientos.nombre_emprendimiento as Empresa',
-                'be_emprendimientos.fotografia',
-                'be_oferta_empleos_empre.titulo',
-                'be_oferta_empleos_empre.descripcion',
-                'be_oferta_empleos_empre.categoria',
-                'be_oferta_empleos_empre.fechaFinOferta',
-                'be_oferta_empleos_empre.requisistos as Requisitos',
-                'be_oferta_empleos_empre.jornada',
-                'be_oferta_empleos_empre.modalidad',
-                'be_oferta_empleos_empre.tipo_contrato',
-                'informacionpersonal.ApellInfPer',
-                'informacionpersonal.ApellMatInfPer',
-                'informacionpersonal.NombInfPer',
-                'be_emprendimientos.CIInfPer',
-                'be_oferta_empleos_empre.created_at'
-            )
-                ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
-                ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer')
-                ->whereNotIn('be_oferta_empleos_empre.id', $interacciones);
-
-            if ($request->has('all') && $request->all === 'true') {
-                $data = $emprendimientos->get();
-                $data->transform(function ($item) {
-                    $attributes = $item->getAttributes();
-                    foreach ($attributes as $key => $value) {
-                        if ($key === 'fotografia' && !empty($value)) {
-                            // ✅ Convertir BLOB a base64
-                            $attributes[$key] = base64_encode($value);
-                        } elseif (is_string($value) && $key !== 'fotografia') {
-                            $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-                        }
-                    }
-                    return $attributes;
-                });
-                return response()->json(['data' => $data]);
-            }
-
-            $data = $emprendimientos->paginate(20);
-            if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
-            }
-            $data->getCollection()->transform(function ($item) {
-                $attributes = $item->getAttributes();
-                foreach ($attributes as $key => $value) {
-                    if (is_string($value)) {
-                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-                    }
-                }
-                return $attributes;
-            });
+        // Si el usuario ya postuló, excluir esas ofertas también
+        if (!empty($interacciones)) {
+            $emprendimientos->whereNotIn('be_oferta_empleos_empre.id', $interacciones);
         }
+
+        // Si piden todos
+        if ($request->has('all') && $request->all === 'true') {
+            $data = $emprendimientos->get();
+            $data->transform(function ($item) {
+                $attributes = $item->getAttributes();
+                foreach ($attributes as $key => $value) {
+                    if ($key === 'fotografia' && !empty($value)) {
+                        $attributes[$key] = base64_encode($value); // ✅ Convertir BLOB a base64
+                    } elseif (is_string($value) && $key !== 'fotografia') {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+                return $attributes;
+            });
+            return response()->json(['data' => $data]);
+        }
+
+        // Si es paginado
+        $data = $emprendimientos->paginate(20);
+        if ($data->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron datos'], 404);
+        }
+
+        $data->getCollection()->transform(function ($item) {
+            $attributes = $item->getAttributes();
+            foreach ($attributes as $key => $value) {
+                if (is_string($value)) {
+                    $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                }
+            }
+            return $attributes;
+        });
 
         try {
             return response()->json([
@@ -146,6 +97,7 @@ class ConstEmprendimientosNOPOST extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
+
 
     /**
      * Store a newly created resource in storage.
