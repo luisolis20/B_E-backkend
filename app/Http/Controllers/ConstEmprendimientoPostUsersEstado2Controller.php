@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\InteraccionesEmprendimiento;
+use App\Models\PostulacionesEmprendimiento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -28,19 +28,21 @@ class ConstEmprendimientoPostUsersEstado2Controller extends Controller
      */
     public function show(string $id)
     {
-        $data = InteraccionesEmprendimiento::select(
-            'be_interacciones_emprendimientos.id',
+        $data = PostulacionesEmprendimiento::select(
+            'be_postulacions_empren.id',
             'be_emprendimientos.ruc',
-            'be_emprendimientos.nombre as Emprendimiento',
-            'be_emprendimientos.categoria',
-            'be_estado_postulaciones_emprendimientos.estado',
-            'be_estado_postulaciones_emprendimientos.detalle_estado',
-            'be_interacciones_emprendimientos.created_at'
+            'be_emprendimientos.nombre_emprendimiento as Empresa',
+            'be_oferta_empleos_empre.titulo as Oferta',
+            'be_oferta_empleos_empre.categoria',
+           'be_estado_postulaciones_emprend.estado',
+           'be_estado_postulaciones_emprend.detalle_estado',
+            'be_postulacions_empren.created_at'
         )
-        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
-        ->join('be_estado_postulaciones_emprendimientos', 'be_estado_postulaciones_emprendimientos.interaccion_id', '=', 'be_interacciones_emprendimientos.id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer')
-        ->where('be_interacciones_emprendimientos.id', $id)
+        ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+        ->join('be_estado_postulaciones_emprend', 'be_estado_postulaciones_emprend.postulacion_empren_id', '=', 'be_postulacions_empren.id')
+        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
+        ->where('be_postulacions_empren.id', $id)
        ->paginate(20);
 
         if ($data->isEmpty()) {
@@ -85,9 +87,9 @@ class ConstEmprendimientoPostUsersEstado2Controller extends Controller
      */
     public function destroy(string $id)
     {
-        $res = InteraccionesEmprendimiento::find($id);
+        $res = PostulacionesEmprendimiento::find($id);
         if(isset($res)){
-            $elim = InteraccionesEmprendimiento::destroy($id);
+            $elim = PostulacionesEmprendimiento::destroy($id);
             if($elim){
                 return response()->json([
                     'data'=>$res,

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ConstOfertController;
 use App\Http\Controllers\ConstOfertEmprenidimientosController;//Emprendimiento
+use App\Http\Controllers\ConstOfertEmprenidimientos2Controller;//Emprendimiento
 use App\Http\Controllers\ConstPostuController;
 use App\Http\Controllers\ConstEmprendimientoPostuController;//Emprendimiento
 use App\Http\Controllers\ConstPostUsersController;
@@ -82,6 +83,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource('vin/consultapostuserestado2empr',ConstEmprendimientoPostUsersEstado2Controller::class);
     Route::apiResource('vin/consultaofert',ConstOfertController::class);
     Route::apiResource('vin/consultaofertempr',ConstOfertEmprenidimientosController::class);//Emprendimiento
+    Route::apiResource('vin/consultaofertempr2',ConstOfertEmprenidimientos2Controller::class);//Emprendimiento
     Route::apiResource('vin/consultanopostofert',ConstOfertasNOPOST::class);
     Route::apiResource('vin/consultanopostempre',ConstEmprendimientosNOPOST::class);//Emprendimiento
     Route::apiResource('vin/estadopostuser',ConstEstadoPOSTController::class);

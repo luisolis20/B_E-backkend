@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class ConstPostUsersEstado2Controller extends Controller
 {
-    /**
+    /** 
      * Display a listing of the resource.
      */
     public function index()

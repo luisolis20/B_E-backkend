@@ -5,7 +5,7 @@ use App\Models\Postulacion;
 use Illuminate\Http\Request;
 
 class Postulacion2Controller extends Controller
-{
+{ 
     /**
      * Display a listing of the resource.
      */

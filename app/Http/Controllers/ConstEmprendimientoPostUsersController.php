@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\InteraccionesEmprendimiento;
+
+use App\Models\PostulacionesEmprendimiento;
 use Illuminate\Http\Request;
 
 class ConstEmprendimientoPostUsersController extends Controller
@@ -27,17 +28,25 @@ class ConstEmprendimientoPostUsersController extends Controller
      */
     public function show(string $id)
     {
-        $data = InteraccionesEmprendimiento::select(
-            'be_interacciones_emprendimientos.id',
+        $data = PostulacionesEmprendimiento::select(
+            'be_postulacions_empren.id',
             'be_emprendimientos.ruc',
-            'be_emprendimientos.nombre_emprendimiento as Emprendimiento',
-            'be_emprendimientos.categoria',
-            'be_interacciones_emprendimientos.created_at'
+            'be_emprendimientos.id as emprendimiento_id',
+            'be_emprendimientos.nombre_emprendimiento as Empresa',
+            'be_oferta_empleos_empre.titulo as Oferta',
+            'be_oferta_empleos_empre.id as oferta_id',
+            'be_oferta_empleos_empre.categoria',
+            'be_estado_postulaciones_emprend.id as estado_id',
+            'be_estado_postulaciones_emprend.estado',
+            'be_estado_postulaciones_emprend.detalle_estado',
+            'be_postulacions_empren.created_at'
         )
-        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer')
-        ->where('informacionpersonal.CIInfPer', $id)
-        ->paginate(20);
+            ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+            ->join('be_estado_postulaciones_emprend', 'be_estado_postulaciones_emprend.postulacion_empren_id', '=', 'be_postulacions_empren.id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
+            ->where('informacionpersonal.CIInfPer', $id)
+            ->paginate(20);
 
         if ($data->isEmpty()) {
             return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
@@ -81,27 +90,24 @@ class ConstEmprendimientoPostUsersController extends Controller
      */
     public function destroy(string $id)
     {
-        $res = InteraccionesEmprendimiento::find($id);
-        if(isset($res)){
-            $elim = InteraccionesEmprendimiento::destroy($id);
-            if($elim){
+        $res = PostulacionesEmprendimiento::find($id);
+        if (isset($res)) {
+            $elim = PostulacionesEmprendimiento::destroy($id);
+            if ($elim) {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Eliminado con Éxito!!",
+                    'data' => $res,
+                    'mensaje' => "Eliminado con Éxito!!",
                 ]);
-            }else{
+            } else {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"La postulación no exite (puede que ya la haya eliminado)",
+                    'data' => $res,
+                    'mensaje' => "La postulación no exite (puede que ya la haya eliminado)",
                 ]);
             }
-           
-           
-           
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"La postulación con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "La postulación con id: $id no Existe",
             ]);
         }
     }

@@ -97,15 +97,20 @@ class InformacionPersonalController extends Controller
        }
 
        // Convertir los campos a UTF-8 válido para cada página
-       $data->getCollection()->transform(function ($item) {
-           $attributes = $item->getAttributes();
-           foreach ($attributes as $key => $value) {
-               if (is_string($value)) {
-                   $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
-               }
-           }
-           return $attributes;
-       });
+        $data->getCollection()->transform(function ($item) {
+            $attributes = $item->getAttributes();
+
+            foreach ($attributes as $key => $value) {
+                if ($key === 'fotografia' && !empty($value)) {
+                    // ✅ Convertir BLOB a base64
+                    $attributes[$key] = base64_encode($value);
+                } elseif (is_string($value) && $key !== 'fotografia') {
+                    $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                }
+            }
+
+            return $attributes;
+        });
 
        // Retornar la respuesta JSON con los metadatos de paginación
        try {

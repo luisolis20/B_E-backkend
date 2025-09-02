@@ -86,10 +86,12 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
     {
         $data = EstadoPostulacionEmprendimiento::select(
             'be_estado_postulaciones_emprend.id',
-            'be_estado_postulaciones_emprend.interaccion_id',
+            'be_estado_postulaciones_emprend.postulacion_empren_id',
             'be_estado_postulaciones_emprend.estado',
-            'be_estado_postulaciones_emprend.detalle_estado',
             'be_estado_postulaciones_emprend.fecha',
+            'be_estado_postulaciones_emprend.detalle_estado',
+            'be_emprendimientos.id as IDEmpresa',
+            'be_emprendimientos.nombre_emprendimiento as Empresa',
             'informacionpersonal.CIInfPer',
             'informacionpersonal.ApellInfPer',
             'informacionpersonal.ApellMatInfPer',
@@ -97,14 +99,14 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
             'informacionpersonal.mailPer',
             'informacionpersonal.CelularInfPer',
             'informacionpersonal.DirecDomicilioPer',
-            'be_emprendimientos.nombre as NombreEmprendimiento',
-            'be_emprendimientos.ruc',
-            'be_emprendimientos.id as IDEmprendimiento',
+            'be_oferta_empleos_empre.titulo as Oferta',
+            'be_oferta_empleos_empre.id as IDOferta',
             'be_estado_postulaciones_emprend.created_at'
         )
-        ->join('be_interacciones_emprendimientos', 'be_interacciones_emprendimientos.id', '=', 'be_estado_postulaciones_emprend.interaccion_id')
-        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer')
+        ->join('be_postulacions_empren', 'be_postulacions_empren.id', '=', 'be_estado_postulaciones_emprend.postulacion_empren_id')
+        ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
         ->where('informacionpersonal.CIInfPer', $id)
         ->paginate(20);
 
@@ -142,7 +144,13 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        
+        $inputs = $request->input();
+        $res = EstadoPostulacionEmprendimiento::where("id", $id)->update($inputs);
+        return response()->json([
+            'data'=>$res,
+            'mensaje'=>"Postulación Actualizada",
+        ]);
     }
 
     /**

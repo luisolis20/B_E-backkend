@@ -6,7 +6,7 @@ use App\Models\Oferta_Empleo;
 use Illuminate\Http\Request;
 
 class ConstOfertController extends Controller
-{
+{ 
     /** 
      * Display a listing of the resource.
      */

@@ -11,7 +11,7 @@ class PostulacionEmprendimientosController extends Controller
      */
     public function index(Request $request)
     {
-        try {
+        try { 
             $query = PostulacionesEmprendimiento::select(
                 'be_postulacions_empren.id',
                 'be_emprendimientos.nombre_emprendimiento as Empresa',
@@ -23,13 +23,14 @@ class PostulacionEmprendimientosController extends Controller
                 'informacionpersonal.NombInfPer',
                 'informacionpersonal.mailPer',
                 'informacionpersonal.fotografia',
-                'estado_postulaciones_be.estado',
-                'estado_postulaciones_be.detalle_estado',
+                'be_estado_postulaciones_emprend.id as estado_id',
+                'be_estado_postulaciones_emprend.estado',
+                'be_estado_postulaciones_emprend.detalle_estado',
                 'be_postulacions_empren.created_at'
             )
             ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
             ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
-            ->join('estado_postulaciones_be', 'estado_postulaciones_be.postulacion_id', '=', 'be_postulacions_empren.id')
+            ->join('be_estado_postulaciones_emprend', 'be_estado_postulaciones_emprend.postulacion_empren_id', '=', 'be_postulacions_empren.id')
             ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer');
 
             // Si se solicita todo sin paginar
@@ -102,10 +103,14 @@ class PostulacionEmprendimientosController extends Controller
             'informacionpersonal.NombInfPer',
             'informacionpersonal.mailPer',
             'informacionpersonal.fotografia',
+            'be_estado_postulaciones_emprend.id as estado_id',
+            'be_estado_postulaciones_emprend.estado',
+            'be_estado_postulaciones_emprend.detalle_estado',
             'be_postulacions_empren.created_at'
         )
         ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
         ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+        ->join('be_estado_postulaciones_emprend', 'be_estado_postulaciones_emprend.postulacion_empren_id', '=', 'be_postulacions_empren.id')
         ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
         ->where('be_oferta_empleos_empre.id', $id)
         ->paginate(20);
@@ -115,12 +120,16 @@ class PostulacionEmprendimientosController extends Controller
         }
 
         $data->getCollection()->transform(function ($item) {
-            foreach ($item->getAttributes() as $key => $value) {
-                if (is_string($value)) {
-                    $item->$key = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+            $attributes = $item->getAttributes();
+            foreach ($attributes as $key => $value) {
+                if ($key === 'fotografia' && !empty($value)) {
+                    // ✅ Convertir BLOB a base64
+                    $attributes[$key] = base64_encode($value);
+                } elseif (is_string($value) && $key !== 'fotografia') {
+                    $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                 }
             }
-            return $item;
+            return $attributes;
         });
 
         return response()->json([
