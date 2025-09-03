@@ -27,7 +27,40 @@ class ConsultaControllerEmprendimiento extends Controller
      */
     public function show(string $id)
     {
-        $res = Emprendimientos::find($id);
+        $data =  Emprendimientos::select('be_emprendimientos.*')
+            ->where('be_emprendimientos.id', $id)
+            ->paginate(20);
+        if ($data->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+        }
+
+        // Convertir los campos a UTF-8 válido para cada página
+        $data->getCollection()->transform(function ($item) {
+            $attributes = $item->getAttributes();
+            foreach ($attributes as $key => $value) {
+                if ($key === 'fotografia' && !empty($value)) {
+                    // ✅ Convertir BLOB a base64
+                    $attributes[$key] = base64_encode($value);
+                } elseif (is_string($value) && $key !== 'fotografia') {
+                    $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                }
+            }
+            return $attributes;
+        });
+
+        // Retornar la respuesta JSON con los metadatos de paginación
+        try {
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+        }
+        /*$res = Emprendimientos::find($id);
         if(isset($res)){
             $data = $res->toArray();
             if (!empty($res->fotografia)) {
@@ -45,7 +78,7 @@ class ConsultaControllerEmprendimiento extends Controller
                 'error'=>true,
                 'mensaje'=>"El Usuario con id: $id no Existe",
             ]);
-        }
+        }*/
     }
 
     /**
@@ -54,17 +87,15 @@ class ConsultaControllerEmprendimiento extends Controller
     public function update(Request $request, string $id)
     {
         
-        $res = Emprendimientos::find($id);
+       $res = Emprendimientos::find($id);
         if (isset($res)) {
             $res->ruc = $request->ruc;
             $res->CIInfPer = $request->CIInfPer;
             $res->nombre_emprendimiento = $request->nombre_emprendimiento;
             $res->descripcion = $request->descripcion;
-            
-           
             if (!empty($res->fotografia)) {
                 $res->fotografia = base64_decode($res->fotografia);
-            }else{
+            } else {
                 $res->fotografia = null;
             }
             $res->tiempo_emprendimiento = $request->tiempo_emprendimiento;
@@ -76,7 +107,7 @@ class ConsultaControllerEmprendimiento extends Controller
             $res->redes_sociales = $request->redes_sociales;
             $res->estado_empren = $request->estado_empren;
             if ($res->save()) {
-                 $data = $res->toArray();
+                $data = $res->toArray();
                 if (!empty($res->fotografia)) {
                     $data['fotografia'] = base64_encode($res->fotografia);
                 }

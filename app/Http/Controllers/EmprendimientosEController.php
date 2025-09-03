@@ -142,10 +142,8 @@ class EmprendimientosEController extends Controller
             $res->CIInfPer = $request->CIInfPer;
             $res->nombre_emprendimiento = $request->nombre_emprendimiento;
             $res->descripcion = $request->descripcion;
-            if (!empty($res->fotografia)) {
-                $res->fotografia = base64_decode($res->fotografia);
-            } else {
-                $res->fotografia = null;
+            if (!empty($request->fotografia)) {
+                $res->fotografia = base64_decode($request->fotografia);
             }
             $res->tiempo_emprendimiento = $request->tiempo_emprendimiento;
             $res->horarios_atencion = $request->horarios_atencion;
