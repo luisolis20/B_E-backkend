@@ -60,6 +60,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource("vin/emprendimientos_E",EmprendimientosEController::class);
     Route::apiResource("vin/users",UserController::class);
     Route::apiResource("vin/oferta__empleos",Oferta_EmpleoController::class);
+    Route::delete("vin/oferta__empleoshabi/{id}",[Oferta_EmpleoController::class, 'habilitar']);
     Route::apiResource("vin/oferta_empleos_emprendimiento",Oferta_EmprendimientosController::class);//Emprendimiento
     Route::apiResource("vin/oferta__empleos2",Oferta_Empleo2Controller::class);
     Route::apiResource("vin/oferta_empleos_emprendimientos2",Oferta_Emprendimientos2Controller::class);//Emprendimiento
@@ -73,6 +74,8 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource('vin/registrotitulos', RegistroTituloController::class);
     Route::apiResource('vin/consultaredir',ConsultaController::class);
     Route::apiResource('vin/consultarediremp',ConsultaControllerEmprendimiento::class);
+    Route::delete('vin/consultaredirempelim/{id}',[ConsultaControllerEmprendimiento::class, 'destroy']);
+    Route::delete('vin/consultaredirempelim2/{id}',[ConsultaControllerEmprendimiento::class, 'habilitar']);
     Route::apiResource('vin/consultapost',ConstPostuController::class);
     Route::apiResource('vin/consultapostempr',ConstEmprendimientoPostuController::class);//Emprendimiento 
     Route::apiResource('vin/consultapostuser',ConstPostUsersController::class);

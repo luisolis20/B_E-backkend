@@ -136,12 +136,45 @@ class ConsultaControllerEmprendimiento extends Controller
     {
         $res = Emprendimientos::find($id);
         if(isset($res)){
-            $elim = Emprendimientos::destroy($id);
+             $res->estado_empren = 0;
+            $res->save();
             $data = $res->toArray();
             if (!empty($res->fotografia)) {
                 $data['fotografia'] = base64_encode($res->fotografia);
             }
-            if($elim){
+            if($data){
+           
+                return response()->json([
+                    'data'=>$data,
+                    'mensaje'=>"Inhabilitado con Éxito!!",
+                ]);
+            }else{
+                return response()->json([
+                    'data'=>$data,
+                    'mensaje'=>"La Empresa no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+           
+           
+           
+        }else{
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>"La Empresa con id: $id no Existe",
+            ]);
+        }
+    }
+    public function habilitar(string $id)
+    {
+        $res = Emprendimientos::find($id);
+        if(isset($res)){
+             $res->estado_empren = 2;
+            $res->save();
+            $data = $res->toArray();
+            if (!empty($res->fotografia)) {
+                $data['fotografia'] = base64_encode($res->fotografia);
+            }
+            if($data){
            
                 return response()->json([
                     'data'=>$data,
@@ -163,4 +196,5 @@ class ConsultaControllerEmprendimiento extends Controller
             ]);
         }
     }
+    
 }

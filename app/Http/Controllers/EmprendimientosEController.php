@@ -97,7 +97,7 @@ class EmprendimientosEController extends Controller
     {
         $data =  Emprendimientos::join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer')
             ->where('informacionpersonal.CIInfPer', $id)
-            ->select('be_emprendimientos.*', 'informacionpersonal.ApellInfPer', 'informacionpersonal.ApellMatInfPer', 'informacionpersonal.NombInfPer')
+            ->select('be_emprendimientos.*', 'informacionpersonal.ApellInfPer', 'informacionpersonal.ApellMatInfPer', 'informacionpersonal.NombInfPer','informacionpersonal.CIInfPer')
             ->paginate(20);
         if ($data->isEmpty()) {
             return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
@@ -188,12 +188,12 @@ class EmprendimientosEController extends Controller
 
             return response()->json([
                 'data' => $res,
-                'mensaje' => "Empresa desactivada con éxito!!",
+                'mensaje' => "Emprendimiento inhabilitado con éxito!!",
             ]);
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "La Empresa con id: $id no Existe",
+                'mensaje' => "El Emprendimiento con id: $id no Existe",
             ]);
         }
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Oferta_Empleo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Oferta_EmpleoController extends Controller
 {
@@ -13,7 +14,44 @@ class Oferta_EmpleoController extends Controller
     {
         try{
 
-            $query =  Oferta_Empleo::select('oferta__empleos_be.*');
+            $query = Oferta_Empleo::select(
+                'oferta__empleos_be.id',
+                'oferta__empleos_be.empresa_id',
+                'praempresa.empresacorta as Empresa',
+                'oferta__empleos_be.titulo',
+                'oferta__empleos_be.descripcion',
+                'oferta__empleos_be.categoria',
+                'oferta__empleos_be.fechaFinOferta',
+                'oferta__empleos_be.requisistos as Requisitos',
+                'oferta__empleos_be.jornada',
+                'oferta__empleos_be.modalidad',
+                'oferta__empleos_be.tipo_contrato',
+                'oferta__empleos_be.estado_ofert',
+                'oferta__empleos_be.updated_at',
+                'praempresa.representante as Jefe',
+                'oferta__empleos_be.created_at',
+                DB::raw('COUNT(postulacions_be.id) as total_postulados') // 🔹 Conteo de postulados
+            )
+            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+            ->leftJoin('postulacions_be', 'postulacions_be.oferta_id', '=', 'oferta__empleos_be.id') // 🔹 unir postulaciones
+            ->groupBy(
+                'oferta__empleos_be.id',
+                'oferta__empleos_be.empresa_id',
+                'praempresa.empresacorta',
+                'oferta__empleos_be.titulo',
+                'oferta__empleos_be.descripcion',
+                'oferta__empleos_be.categoria',
+                'oferta__empleos_be.fechaFinOferta',
+                'oferta__empleos_be.requisistos',
+                'oferta__empleos_be.jornada',
+                'oferta__empleos_be.modalidad',
+                'oferta__empleos_be.tipo_contrato',
+                'oferta__empleos_be.estado_ofert',
+                'oferta__empleos_be.updated_at',
+                'praempresa.representante',
+                'oferta__empleos_be.created_at'
+            );
+
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
 
@@ -155,20 +193,23 @@ class Oferta_EmpleoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+     public function destroy(string $id)
     {
         $res = Oferta_Empleo::find($id);
         if(isset($res)){
-            $elim = Oferta_Empleo::destroy($id);
-            if($elim){
+             $res->estado_ofert = 0;
+            $res->save();
+            $data = $res->toArray();
+            if($data){
+           
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Eliminado con Éxito!!",
+                    'data'=>$data,
+                    'mensaje'=>"Inhabilitado con Éxito!!",
                 ]);
             }else{
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"La Oferta_Empleo no existe (puede que ya la haya eliminado)",
+                    'data'=>$data,
+                    'mensaje'=>"La Empresa no existe (puede que ya la haya eliminado)",
                 ]);
             }
            
@@ -177,7 +218,39 @@ class Oferta_EmpleoController extends Controller
         }else{
             return response()->json([
                 'error'=>true,
-                'mensaje'=>"La Oferta_Empleo con id: $id no Existe",
+                'mensaje'=>"La Empresa con id: $id no Existe",
+            ]);
+        }
+    }
+    public function habilitar(string $id)
+    {
+        $res = Oferta_Empleo::find($id);
+        if(isset($res)){
+             $res->estado_ofert = 1;
+            $res->save();
+            $data = $res->toArray();
+            if (!empty($res->fotografia)) {
+                $data['fotografia'] = base64_encode($res->fotografia);
+            }
+            if($data){
+           
+                return response()->json([
+                    'data'=>$data,
+                    'mensaje'=>"Eliminado con Éxito!!",
+                ]);
+            }else{
+                return response()->json([
+                    'data'=>$data,
+                    'mensaje'=>"La Empresa no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+           
+           
+           
+        }else{
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>"La Empresa con id: $id no Existe",
             ]);
         }
     }

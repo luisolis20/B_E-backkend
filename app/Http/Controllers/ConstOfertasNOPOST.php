@@ -36,11 +36,13 @@ class ConstOfertasNOPOST extends Controller
                 'oferta__empleos_be.jornada',
                 'oferta__empleos_be.modalidad',
                 'oferta__empleos_be.tipo_contrato',
+                'oferta__empleos_be.estado_ofert',
                 'praempresa.representante as Jefe',
                 'oferta__empleos_be.created_at'
             )
                 ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-                ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id');
+                ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+                ->where('oferta__empleos_be.estado_ofert','=', 1);
             if ($request->has('all') && $request->all === 'true') {
                 $data = $ofertas->get();
 
@@ -89,11 +91,13 @@ class ConstOfertasNOPOST extends Controller
                 'oferta__empleos_be.jornada',
                 'oferta__empleos_be.modalidad',
                 'oferta__empleos_be.tipo_contrato',
+                'oferta__empleos_be.estado_ofert',
                 'praempresa.representante as Jefe',
                 'oferta__empleos_be.created_at'
             )
                 ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
                 ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+                ->where('oferta__empleos_be.estado_ofert','=', 1)
                 ->whereNotIn('oferta__empleos_be.id', $postulaciones); // Excluir las ofertas en las que el usuario ya ha postulado
             if ($request->has('all') && $request->all === 'true') {
                 $data = $ofertas->get();
