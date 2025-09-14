@@ -71,7 +71,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        $inputs["password"] = md5(trim($request->password)); 
+        $inputs["password"] = md5($request->password); 
         $res = User::create($inputs);
         return response()->json([
             'data'=>$res,
@@ -110,7 +110,7 @@ class UserController extends Controller
         if(isset($res)){
             $res->name = $request->name;
             $res->email = $request->email;
-            $res->password = md5(trim($request->password));
+            $res->password = md5($request->password);
             $res->role = $request->role;
             $res->estado = $request->estado;
             if($res->save()){
@@ -140,15 +140,47 @@ class UserController extends Controller
     {
         $res = User::find($id);
         if(isset($res)){
-            $elim = User::destroy($id);
-            if($elim){
+             $res->estado = 0;
+            $res->save();
+            $data = $res->toArray();
+            if($data){
+           
                 return response()->json([
-                    'data'=>$res,
+                    'data'=>$data,
+                    'mensaje'=>"Inhabilitado con Éxito!!",
+                ]);
+            }else{
+                return response()->json([
+                    'data'=>$data,
+                    'mensaje'=>"El usuario no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+           
+           
+           
+        }else{
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>"El usuario con id: $id no Existe",
+            ]);
+        }
+    }
+    public function habilitar(string $id)
+    {
+        $res = User::find($id);
+        if(isset($res)){
+             $res->estado = 1;
+            $res->save();
+            $data = $res->toArray();
+            if($data){
+           
+                return response()->json([
+                    'data'=>$data,
                     'mensaje'=>"Eliminado con Éxito!!",
                 ]);
             }else{
                 return response()->json([
-                    'data'=>$res,
+                    'data'=>$data,
                     'mensaje'=>"El usuario no existe (puede que ya la haya eliminado)",
                 ]);
             }

@@ -59,6 +59,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource("vin/empresas",EmpresaController::class);
     Route::apiResource("vin/emprendimientos_E",EmprendimientosEController::class);
     Route::apiResource("vin/users",UserController::class);
+    Route::delete("vin/usershabi/{id}",[UserController::class, 'habilitar']);
     Route::apiResource("vin/oferta__empleos",Oferta_EmpleoController::class);
     Route::delete("vin/oferta__empleoshabi/{id}",[Oferta_EmpleoController::class, 'habilitar']);
     Route::apiResource("vin/oferta_empleos_emprendimiento",Oferta_EmprendimientosController::class);//Emprendimiento

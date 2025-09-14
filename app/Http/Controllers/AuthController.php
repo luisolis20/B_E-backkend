@@ -56,7 +56,7 @@ class AuthController extends Controller
                     [
                         'name' => $res->ApellInfPer,
                         'CIInfPer' => $res->CIInfPer,
-                        'password' => bcrypt($codigo_dactilar),
+                        'password' => md5($codigo_dactilar),
                         'role' => 'Estudiante',
                         'estado' => 1,
                     ]
@@ -97,7 +97,7 @@ class AuthController extends Controller
                 ], Response::HTTP_UNAUTHORIZED);
             }
     
-            if (!Hash::check($codigo_dactilar, $user->password)) {
+            if (md5($codigo_dactilar) !== $user->password) {
                 return response()->json([
                     'error' => true,
                     'mensaje' => 'Usuario correcto pero la clave es incorrecta',

@@ -229,9 +229,6 @@ class Oferta_EmpleoController extends Controller
              $res->estado_ofert = 1;
             $res->save();
             $data = $res->toArray();
-            if (!empty($res->fotografia)) {
-                $data['fotografia'] = base64_encode($res->fotografia);
-            }
             if($data){
            
                 return response()->json([
