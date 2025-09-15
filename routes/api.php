@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('b_e')->group(function () {
 
     Route::apiResource("vin/empresas",EmpresaController::class);
+    Route::get("vin/empresasEM/{id}",[EmpresaController::class, 'ver_empresa']);
     Route::apiResource("vin/emprendimientos_E",EmprendimientosEController::class);
     Route::apiResource("vin/users",UserController::class);
     Route::delete("vin/usershabi/{id}",[UserController::class, 'habilitar']);

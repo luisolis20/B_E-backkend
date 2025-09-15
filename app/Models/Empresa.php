@@ -10,21 +10,17 @@ class Empresa extends Model
     use HasFactory;
     protected $table = 'praempresa';
     protected $primaryKey = 'idempresa';
-    public $timestamps = false;
+    //public $timestamps = false;
     protected $fillable = [
         'idempresa',
         'ruc',
         'empresa',
         'empresacorta',
-        'pais',
         'lugar',
-        'vision',
-        'mision',
         'direccion',
         'telefono',
         'email',
         'url',
-        'logo',
         'tipo',
         'titulo',
         'representante',
@@ -32,7 +28,12 @@ class Empresa extends Model
         'actividad',
         'fechafin',
         'tipoinstitucion',
+        'pais',
+        'vision',
+        'mision',
+        'estado_empr',
         'imagen',
+        'ciudad',
         'usuario_id',
     ];
 
@@ -40,7 +41,7 @@ class Empresa extends Model
     {
         return $this->belongsTo(User::class, 'usuario_id');
     }
-    
+
     public function ofertasEmpleo()
     {
         return $this->hasMany(Oferta_Empleo::class, 'empresa_id');
