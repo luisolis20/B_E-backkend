@@ -28,6 +28,7 @@ class ConstOfertasNOPOST extends Controller
                 'oferta__empleos_be.id',
                 'oferta__empleos_be.empresa_id',
                 'praempresa.empresacorta as Empresa',
+                'praempresa.imagen',
                 'oferta__empleos_be.titulo',
                 'oferta__empleos_be.descripcion',
                 'oferta__empleos_be.categoria',
@@ -42,21 +43,20 @@ class ConstOfertasNOPOST extends Controller
             )
                 ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
                 ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
-                ->where('oferta__empleos_be.estado_ofert','=', 1);
+                ->where('oferta__empleos_be.estado_ofert', '=', 1);
             if ($request->has('all') && $request->all === 'true') {
                 $data = $ofertas->get();
-
-                // Convertir los datos a UTF-8 válido
                 $data->transform(function ($item) {
                     $attributes = $item->getAttributes();
                     foreach ($attributes as $key => $value) {
-                        if (is_string($value)) {
+                        if ($key === 'imagen' && !empty($value)) {
+                            $attributes[$key] = base64_encode($value); // ✅ Convertir BLOB a base64
+                        } elseif (is_string($value) && $key !== 'imagen') {
                             $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                         }
                     }
                     return $attributes;
                 });
-
                 return response()->json(['data' => $data]);
             }
 
@@ -83,6 +83,7 @@ class ConstOfertasNOPOST extends Controller
                 'oferta__empleos_be.id',
                 'oferta__empleos_be.empresa_id',
                 'praempresa.empresacorta as Empresa',
+                'praempresa.imagen',
                 'oferta__empleos_be.titulo',
                 'oferta__empleos_be.descripcion',
                 'oferta__empleos_be.categoria',
@@ -97,22 +98,21 @@ class ConstOfertasNOPOST extends Controller
             )
                 ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
                 ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
-                ->where('oferta__empleos_be.estado_ofert','=', 1)
+                ->where('oferta__empleos_be.estado_ofert', '=', 1)
                 ->whereNotIn('oferta__empleos_be.id', $postulaciones); // Excluir las ofertas en las que el usuario ya ha postulado
-            if ($request->has('all') && $request->all === 'true') {
+             if ($request->has('all') && $request->all === 'true') {
                 $data = $ofertas->get();
-
-                // Convertir los datos a UTF-8 válido
                 $data->transform(function ($item) {
                     $attributes = $item->getAttributes();
                     foreach ($attributes as $key => $value) {
-                        if (is_string($value)) {
+                        if ($key === 'imagen' && !empty($value)) {
+                            $attributes[$key] = base64_encode($value); // ✅ Convertir BLOB a base64
+                        } elseif (is_string($value) && $key !== 'imagen') {
                             $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                         }
                     }
                     return $attributes;
                 });
-
                 return response()->json(['data' => $data]);
             }
 

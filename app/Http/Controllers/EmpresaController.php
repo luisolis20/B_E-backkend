@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Empresa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EmpresaController extends Controller
 {
@@ -94,9 +95,69 @@ class EmpresaController extends Controller
     public function show(string $id)
     {
         try {
-            $data =  Empresa::join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+            $data =  Empresa::select(
+                'praempresa.idempresa',
+                'praempresa.ruc',
+                'praempresa.empresa',
+                'praempresa.empresacorta',
+                'praempresa.lugar',
+                'praempresa.direccion',
+                'praempresa.telefono',
+                'praempresa.email',
+                'praempresa.url',
+                'praempresa.tipo',
+                'praempresa.titulo',
+                'praempresa.representante',
+                'praempresa.cargo',
+                'praempresa.actividad',
+                'praempresa.fechafin',
+                'praempresa.tipoinstitucion',
+                'praempresa.pais',
+                'praempresa.vision',
+                'praempresa.mision',
+                'praempresa.estado_empr',
+                'praempresa.imagen',
+                'praempresa.ciudad',
+                'praempresa.usuario_id',
+                'praempresa.created_at',
+                'praempresa.updated_at',
+                'be_users.id',
+                'be_users.name',
+
+                DB::raw('COUNT(oferta__empleos_be.id) as total_ofertas') // 🔹 
+            )
+            ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+            ->leftJoin('oferta__empleos_be', 'oferta__empleos_be.empresa_id', '=', 'praempresa.idempresa') // 🔹
+            ->groupBy(
+                'praempresa.idempresa',
+                'praempresa.ruc',
+                'praempresa.empresa',
+                'praempresa.empresacorta',
+                'praempresa.lugar',
+                'praempresa.direccion',
+                'praempresa.telefono',
+                'praempresa.email',
+                'praempresa.url',
+                'praempresa.tipo',
+                'praempresa.titulo',
+                'praempresa.representante',
+                'praempresa.cargo',
+                'praempresa.actividad',
+                'praempresa.fechafin',
+                'praempresa.tipoinstitucion',
+                'praempresa.pais',
+                'praempresa.vision',
+                'praempresa.mision',
+                'praempresa.estado_empr',
+                'praempresa.imagen',
+                'praempresa.ciudad',
+                'praempresa.usuario_id',
+                'praempresa.created_at',
+                'praempresa.updated_at',
+                'be_users.id',
+                'be_users.name',
+            )
                 ->where('be_users.id', $id)
-                ->select('praempresa.*')
                 ->paginate(20);
             if ($data->isEmpty()) {
                 return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);

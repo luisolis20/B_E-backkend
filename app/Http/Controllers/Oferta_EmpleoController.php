@@ -118,11 +118,46 @@ class Oferta_EmpleoController extends Controller
      */
     public function show(string $id)
     {
-        $data = Oferta_Empleo::join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-        ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
-        ->where('be_users.id', $id)
-        ->select('oferta__empleos_be.*')
-        ->paginate(20);
+        $data = Oferta_Empleo::select(
+                'oferta__empleos_be.id',
+                'oferta__empleos_be.empresa_id',
+                'praempresa.empresacorta as Empresa',
+                'oferta__empleos_be.titulo',
+                'oferta__empleos_be.descripcion',
+                'oferta__empleos_be.categoria',
+                'oferta__empleos_be.fechaFinOferta',
+                'oferta__empleos_be.requisistos as Requisitos',
+                'oferta__empleos_be.jornada',
+                'oferta__empleos_be.modalidad',
+                'oferta__empleos_be.tipo_contrato',
+                'oferta__empleos_be.estado_ofert',
+                'oferta__empleos_be.updated_at',
+                'praempresa.representante as Jefe',
+                'oferta__empleos_be.created_at',
+                DB::raw('COUNT(postulacions_be.id) as total_postulados') // 🔹 Conteo de postulados
+            )
+            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+            ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+            ->leftJoin('postulacions_be', 'postulacions_be.oferta_id', '=', 'oferta__empleos_be.id') // 🔹 unir postulaciones
+            ->groupBy(
+                'oferta__empleos_be.id',
+                'oferta__empleos_be.empresa_id',
+                'praempresa.empresacorta',
+                'oferta__empleos_be.titulo',
+                'oferta__empleos_be.descripcion',
+                'oferta__empleos_be.categoria',
+                'oferta__empleos_be.fechaFinOferta',
+                'oferta__empleos_be.requisistos',
+                'oferta__empleos_be.jornada',
+                'oferta__empleos_be.modalidad',
+                'oferta__empleos_be.tipo_contrato',
+                'oferta__empleos_be.estado_ofert',
+                'oferta__empleos_be.updated_at',
+                'praempresa.representante',
+                'oferta__empleos_be.created_at'
+            )
+            ->where('be_users.id', $id)
+            ->paginate(20);
 
         if ($data->isEmpty()) {
             return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
@@ -169,6 +204,7 @@ class Oferta_EmpleoController extends Controller
             $res->modalidad = $request->modalidad;
             $res->categoria = $request->categoria;
             $res->fechaFinOferta = $request->fechaFinOferta;
+            $res->estado_ofert = $request->estado_ofert;
             $res->empresa_id = $request->empresa_id;
             if($res->save()){
                 return response()->json([

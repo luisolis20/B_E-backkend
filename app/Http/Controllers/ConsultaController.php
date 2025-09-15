@@ -9,9 +9,60 @@ class ConsultaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Empresa::all();
+       try {
+
+            $query = Empresa::select('praempresa.*');
+            if ($request->has('all') && $request->all === 'true') {
+                $data = $query->get();
+
+                // Convertir los datos a UTF-8 válido
+                $data->transform(function ($item) {
+                    $attributes = $item->getAttributes();
+                    foreach ($attributes as $key => $value) {
+                        if (is_string($value)) {
+                            $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                        }
+                    }
+                    return $attributes;
+                });
+
+                return response()->json(['data' => $data]);
+            }
+
+            // Paginación por defecto
+            $data = $query->paginate(20);
+
+            if ($data->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron datos'], 404);
+            }
+
+            // Convertir los datos de cada página a UTF-8 válido
+            $data->getCollection()->transform(function ($item) {
+                $attributes = $item->getAttributes();
+                foreach ($attributes as $key => $value) {
+                    if ($key === 'imagen' && !empty($value)) {
+                        // ✅ Convertir BLOB a base64
+                        $attributes[$key] = base64_encode($value);
+                    } elseif (is_string($value) && $key !== 'imagen') {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+                return $attributes;
+            });
+
+            // Retornar respuesta JSON con metadatos de paginación
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -27,18 +78,18 @@ class ConsultaController extends Controller
      */
     public function show(string $id)
     {
-        $res = Empresa::find($id);
-        if(isset($res)){
+         $res = Empresa::find($id);
+        if (isset($res)) {
+            // Verificar si la imagen existe y codificarla en base64
+            $res->imagen = $res->imagen ? base64_encode($res->imagen) : null;
             return response()->json([
-                'data'=>$res,
-                'mensaje'=>"Encontrado con Éxito!!",
+                'data' => $res,
+                'mensaje' => "Encontrado con Éxito!!",
             ]);
-           
-           
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"El Usuario con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "La Empresa con id: $id no Existe",
             ]);
         }
     }
@@ -50,7 +101,7 @@ class ConsultaController extends Controller
     {
         $res = Empresa::find($id);
         if(isset($res)){
-            $res->ruc = $request->ruc;
+             $res->ruc = $request->ruc;
             $res->empresa = $request->empresa;
             $res->empresacorta = $request->empresacorta;
             $res->pais = $request->pais;
@@ -61,26 +112,32 @@ class ConsultaController extends Controller
             $res->telefono = $request->telefono;
             $res->email = $request->email;
             $res->url = $request->url;
-            $res->logo = $request->logo;
             $res->tipo = $request->tipo;
             $res->titulo = $request->titulo;
             $res->representante = $request->representante;
             $res->cargo = $request->cargo;
             $res->actividad = $request->actividad;
             $res->fechafin = $request->fechafin;
+            $res->ciudad = $request->ciudad;
+            $res->estado_empr = $request->estado_empr;
             $res->tipoinstitucion = $request->tipoinstitucion;
-            $res->imagen = $request->imagen;
-            $res->usuario_id = $request->usuario_id;
-            if($res->save()){
-                return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Actualizado con Éxito!!",
-                ]);
+            if (!empty($request->imagen)) {
+                $res->imagen = base64_decode($request->imagen);
             }
-            else{
+            $res->usuario_id = $request->usuario_id;
+            if ($res->save()) {
+                $data = $res->toArray();
+                if (!empty($res->imagen)) {
+                    $data['imagen'] = base64_encode($res->imagen);
+                }
                 return response()->json([
-                    'error'=>true,
-                    'mensaje'=>"Error al Actualizar",
+                    'data' => $data,
+                    'mensaje' => "Actualizado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "Error al Actualizar",
                 ]);
             }
         }else{
