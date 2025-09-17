@@ -144,7 +144,12 @@ class ConstEstadoPOSTController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $inputs = $request->input();
+        $res = EstadoPostulacion::where("id", $id)->update($inputs);
+        return response()->json([
+            'data'=>$res,
+            'mensaje'=>"Postulación Actualizada",
+        ]);
     }
 
     /**

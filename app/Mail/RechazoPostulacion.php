@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AceptacionPostulacion extends Mailable
+class RechazoPostulacion extends Mailable
 {
     use Queueable, SerializesModels;
     public $nombreUsuario;
@@ -31,7 +31,7 @@ class AceptacionPostulacion extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Postulación Aceptada - Bolsa de Empleo UTLVTE',
+            subject: 'Postulación Rechazada - Bolsa de Empleo UTLVTE',
         );
     }
 
@@ -41,7 +41,7 @@ class AceptacionPostulacion extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.aceptar-postulacion',
+            view: 'mails.rechazar-postulacion',
         );
     }
 
@@ -56,8 +56,8 @@ class AceptacionPostulacion extends Mailable
     }
     public function build()
     {
-        return $this->subject('Postulación Aceptada - Bolsa de Empleo UTLVTE')
-        ->view('mails.aceptar-postulacion')
+        return $this->subject('Postulación Rechazada - Bolsa de Empleo UTLVTE')
+        ->view('mails.rechazar-postulacion')
         ->with(['nombreUsuario' => $this->nombreUsuario,
             'nombreEmpresa' => $this->nombreEmpresa,
             'nombreOferta' => $this->nombreOferta]);

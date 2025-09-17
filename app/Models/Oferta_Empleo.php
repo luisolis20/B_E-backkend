@@ -18,6 +18,7 @@ class Oferta_Empleo extends Model
         'modalidad',
         'categoria',
         'fechaFinOferta',
+        'estado_ofert',
         'empresa_id',
     ];
 

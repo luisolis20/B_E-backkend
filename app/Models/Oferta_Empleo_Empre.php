@@ -18,6 +18,7 @@ class Oferta_Empleo_Empre extends Model
         'modalidad',
         'categoria',
         'fechaFinOferta',
+        'estado_ofert_empr',
         'emprendimiento_id',
     ];
 

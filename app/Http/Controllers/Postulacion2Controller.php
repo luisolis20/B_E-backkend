@@ -23,11 +23,18 @@ class Postulacion2Controller extends Controller
                 'informacionpersonal.ApellMatInfPer',
                 'informacionpersonal.NombInfPer',
                 'informacionpersonal.mailPer',
+                'estado_postulaciones_be.id as estado_id',
+                'estado_postulaciones_be.estado',
+                'estado_postulaciones_be.detalle_estado',
+                'estado_postulaciones_be.fecha',
                 'postulacions_be.created_at'
             )
             ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
             ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer');
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
+            ->join('be_users','be_users.id','=','praempresa.usuario_id')
+            ->leftJoin('estado_postulaciones_be', 'estado_postulaciones_be.postulacion_id', '=', 'postulacions_be.id')
+            ->where('be_users.id', $request->user_id); // usuario dueño de la empresa
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
     

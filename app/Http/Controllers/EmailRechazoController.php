@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\AceptacionPostulacion;
-class EmailController extends Controller
+use App\Mail\RechazoPostulacion;
+class EmailRechazoController extends Controller
 {
     //
     //public function sendEmail(Request $request)
-    public function enviarAceptacionPostulacion(Request $request)
+    public function enviarrechazoPostulacion(Request $request)
         {
         
             //$data = $request->validate([
@@ -30,7 +30,7 @@ class EmailController extends Controller
 
             try {
                 // Envía el correo electrónico de aceptación de postulación al usuario
-                Mail::to($correoDestino)->send(new AceptacionPostulacion($nombreUsuario, $nombreEmpresa, $nombreOferta));
+                Mail::to($correoDestino)->send(new RechazoPostulacion($nombreUsuario, $nombreEmpresa, $nombreOferta));
     
                 return response()->json(['nombreUsuario'=>$nombreUsuario,
                     'nombreEmpresa'=>$nombreEmpresa,

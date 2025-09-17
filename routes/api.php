@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CorreoController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\EmailRechazoController;
 use App\Http\Controllers\EliminarPostulacionController;
 use App\Http\Controllers\InformacionPersonalController;
 use App\Http\Controllers\RegistroTituloController;
@@ -97,6 +98,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource('vin/estadopostuser2empr',ConstEstadoEMprendimientoPOST2Controller::class);
     Route::post('vin/enviar-correo', [CorreoController::class, 'enviarCorreo']);
     Route::post('vin/enviar-aceptacion-postulacion', [EmailController::class, 'enviarAceptacionPostulacion']);
+    Route::post('vin/enviar-rechazo-postulacion', [EmailRechazoController::class, 'enviarrechazoPostulacion']);
     Route::delete('vin/eliminar-postulacion/{id}', [EliminarPostulacionController::class, 'eliminarPostulacion']);
 
     //Login
