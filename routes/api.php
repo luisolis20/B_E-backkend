@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CorreoController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\EmailRechazoController;
+use App\Http\Controllers\EmailEnviarEmprenController;
 use App\Http\Controllers\EliminarPostulacionController;
 use App\Http\Controllers\InformacionPersonalController;
 use App\Http\Controllers\RegistroTituloController;
@@ -40,6 +41,7 @@ use App\Http\Controllers\Oferta_Empleo2Controller;
 use App\Http\Controllers\Oferta_Emprendimientos2Controller;
 use App\Http\Controllers\EnviarComentarioController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InformacionPersonalDController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +60,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('b_e')->group(function () {
 
     Route::apiResource("vin/empresas",EmpresaController::class);
+    Route::delete("vin/empresashabi/{id}",[EmpresaController::class, 'habilitar']);
     Route::get("vin/empresasEM/{id}",[EmpresaController::class, 'ver_empresa']);
     Route::apiResource("vin/emprendimientos_E",EmprendimientosEController::class);
     Route::apiResource("vin/users",UserController::class);
@@ -74,6 +77,7 @@ Route::prefix('b_e')->group(function () {
     Route::post('vin/enviar-comentario', [EnviarComentarioController::class, 'enviarComentario']);
     Route::post('vin/login', [InformacionPersonalController::class, 'login']);
     Route::apiResource('vin/informacionpersonal', InformacionPersonalController::class);
+    Route::apiResource('vin/informacionpersonalD', InformacionPersonalDController::class);
     Route::apiResource('vin/registrotitulos', RegistroTituloController::class);
     Route::apiResource('vin/consultaredir',ConsultaController::class);
     Route::apiResource('vin/consultarediremp',ConsultaControllerEmprendimiento::class);
@@ -99,6 +103,7 @@ Route::prefix('b_e')->group(function () {
     Route::post('vin/enviar-correo', [CorreoController::class, 'enviarCorreo']);
     Route::post('vin/enviar-aceptacion-postulacion', [EmailController::class, 'enviarAceptacionPostulacion']);
     Route::post('vin/enviar-rechazo-postulacion', [EmailRechazoController::class, 'enviarrechazoPostulacion']);
+    Route::post('vin/revision-emprendimiento', [EmailEnviarEmprenController::class, 'enviarrevisionEmprendimiento']);
     Route::delete('vin/eliminar-postulacion/{id}', [EliminarPostulacionController::class, 'eliminarPostulacion']);
 
     //Login

@@ -4,26 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\AceptacionPostulacion;
-class EmailController extends Controller
+use App\Mail\EnviarEmprendimiento;
+class EmailEnviarEmprenController extends Controller
 {
     //
     //public function sendEmail(Request $request)
-    public function enviarAceptacionPostulacion(Request $request)
+    public function enviarrevisionEmprendimiento(Request $request)
         {
         
-            $correoDestino = $request->input('email');
+            $correoUsuario = $request->input('email');
             $nombreUsuario = $request->input('firts_name');
-            $nombreEmpresa = $request->input('company_name');
-            $nombreOferta = $request->input('job_offer');
+            $nombreEmprendimiento = $request->input('nombreEmprendimiento');
 
             try {
                 // Envía el correo electrónico de aceptación de postulación al usuario
-                Mail::to($correoDestino)->send(new AceptacionPostulacion($nombreUsuario, $nombreEmpresa, $nombreOferta));
+                Mail::send(new EnviarEmprendimiento($nombreUsuario, $nombreEmprendimiento, $correoUsuario));
     
                 return response()->json(['nombreUsuario'=>$nombreUsuario,
-                    'nombreEmpresa'=>$nombreEmpresa,
-                    'nombreOferta'=>$nombreOferta,
+                    'nombreEmprendimiento'=>$nombreEmprendimiento,
+                    'correoUsuario'=>$correoUsuario,
                     'message' => 'Correo de aceptación de postulación enviado con éxito al usuario'], 200);
             } catch (\Exception $e) {
                 return response()->json(['error' => 'Error al enviar el correo electrónico de aceptación de postulación: ' . $e->getMessage()], 500);

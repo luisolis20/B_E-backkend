@@ -15,7 +15,68 @@ class EmpresaController extends Controller
     {
         try {
 
-            $query = Empresa::select('praempresa.*');
+            $query = Empresa::select(
+                'praempresa.idempresa',
+                'praempresa.ruc',
+                'praempresa.empresa',
+                'praempresa.empresacorta',
+                'praempresa.lugar',
+                'praempresa.direccion',
+                'praempresa.telefono',
+                'praempresa.email',
+                'praempresa.url',
+                'praempresa.tipo',
+                'praempresa.titulo',
+                'praempresa.representante',
+                'praempresa.cargo',
+                'praempresa.actividad',
+                'praempresa.fechafin',
+                'praempresa.tipoinstitucion',
+                'praempresa.pais',
+                'praempresa.vision',
+                'praempresa.mision',
+                'praempresa.estado_empr',
+                'praempresa.imagen',
+                'praempresa.ciudad',
+                'praempresa.usuario_id',
+                'praempresa.created_at',
+                'praempresa.updated_at',
+                'be_users.id',
+                'be_users.name',
+
+                DB::raw('COUNT(oferta__empleos_be.id) as total_ofertas')
+            )
+                ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+                ->leftJoin('oferta__empleos_be', 'oferta__empleos_be.empresa_id', '=', 'praempresa.idempresa') // 🔹
+                ->groupBy(
+                    'praempresa.idempresa',
+                    'praempresa.ruc',
+                    'praempresa.empresa',
+                    'praempresa.empresacorta',
+                    'praempresa.lugar',
+                    'praempresa.direccion',
+                    'praempresa.telefono',
+                    'praempresa.email',
+                    'praempresa.url',
+                    'praempresa.tipo',
+                    'praempresa.titulo',
+                    'praempresa.representante',
+                    'praempresa.cargo',
+                    'praempresa.actividad',
+                    'praempresa.fechafin',
+                    'praempresa.tipoinstitucion',
+                    'praempresa.pais',
+                    'praempresa.vision',
+                    'praempresa.mision',
+                    'praempresa.estado_empr',
+                    'praempresa.imagen',
+                    'praempresa.ciudad',
+                    'praempresa.usuario_id',
+                    'praempresa.created_at',
+                    'praempresa.updated_at',
+                    'be_users.id',
+                    'be_users.name',
+                );
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
 
@@ -126,37 +187,37 @@ class EmpresaController extends Controller
 
                 DB::raw('COUNT(oferta__empleos_be.id) as total_ofertas') // 🔹 
             )
-            ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
-            ->leftJoin('oferta__empleos_be', 'oferta__empleos_be.empresa_id', '=', 'praempresa.idempresa') // 🔹
-            ->groupBy(
-                'praempresa.idempresa',
-                'praempresa.ruc',
-                'praempresa.empresa',
-                'praempresa.empresacorta',
-                'praempresa.lugar',
-                'praempresa.direccion',
-                'praempresa.telefono',
-                'praempresa.email',
-                'praempresa.url',
-                'praempresa.tipo',
-                'praempresa.titulo',
-                'praempresa.representante',
-                'praempresa.cargo',
-                'praempresa.actividad',
-                'praempresa.fechafin',
-                'praempresa.tipoinstitucion',
-                'praempresa.pais',
-                'praempresa.vision',
-                'praempresa.mision',
-                'praempresa.estado_empr',
-                'praempresa.imagen',
-                'praempresa.ciudad',
-                'praempresa.usuario_id',
-                'praempresa.created_at',
-                'praempresa.updated_at',
-                'be_users.id',
-                'be_users.name',
-            )
+                ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+                ->leftJoin('oferta__empleos_be', 'oferta__empleos_be.empresa_id', '=', 'praempresa.idempresa') // 🔹
+                ->groupBy(
+                    'praempresa.idempresa',
+                    'praempresa.ruc',
+                    'praempresa.empresa',
+                    'praempresa.empresacorta',
+                    'praempresa.lugar',
+                    'praempresa.direccion',
+                    'praempresa.telefono',
+                    'praempresa.email',
+                    'praempresa.url',
+                    'praempresa.tipo',
+                    'praempresa.titulo',
+                    'praempresa.representante',
+                    'praempresa.cargo',
+                    'praempresa.actividad',
+                    'praempresa.fechafin',
+                    'praempresa.tipoinstitucion',
+                    'praempresa.pais',
+                    'praempresa.vision',
+                    'praempresa.mision',
+                    'praempresa.estado_empr',
+                    'praempresa.imagen',
+                    'praempresa.ciudad',
+                    'praempresa.usuario_id',
+                    'praempresa.created_at',
+                    'praempresa.updated_at',
+                    'be_users.id',
+                    'be_users.name',
+                )
                 ->where('be_users.id', $id)
                 ->paginate(20);
             if ($data->isEmpty()) {
@@ -267,7 +328,7 @@ class EmpresaController extends Controller
      */
     public function destroy(string $id)
     {
-       $res = Empresa::find($id);
+        $res = Empresa::find($id);
         if (isset($res)) {
             $res->estado_empr = 0;
             $res->save();
@@ -275,6 +336,25 @@ class EmpresaController extends Controller
             return response()->json([
                 'data' => $res,
                 'mensaje' => "Empresa inhabilitada con éxito!!",
+            ]);
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "La Empresa con id: $id no Existe",
+            ]);
+        }
+    }
+
+    public function habilitar(string $id)
+    {
+        $res = Empresa::find($id);
+        if (isset($res)) {
+            $res->estado_empr = 1;
+            $res->save();
+
+            return response()->json([
+                'data' => $res,
+                'mensaje' => "Empresa habilitada con éxito!!",
             ]);
         } else {
             return response()->json([
