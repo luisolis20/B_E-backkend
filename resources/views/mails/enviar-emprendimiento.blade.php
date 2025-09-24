@@ -116,7 +116,7 @@
         <!-- Footer -->
         <p class="footer">
             La UTLVTE impulsa el emprendimiento y la empleabilidad de sus estudiantes. <br>
-            Gracias por tu gestión y compromiso con nuestra comunidad universitaria. <br><br>
+            Gracias por tu gestión y compromiso con nuestra comunidad universitaria. <br><br><br> Nota: No respona a este correo, ya que es un registro de contacto.<br>
             Atentamente,<br>
             <strong>BOLSA DE EMPLEO UTLVTE</strong><br>
             <img src="{{ $message->embed(public_path('img/footer.png')) }}" alt="Footer" class="footer-img">

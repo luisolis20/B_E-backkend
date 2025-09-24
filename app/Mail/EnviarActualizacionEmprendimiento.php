@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class EnviarEmprendimiento extends Mailable
+class EnviarActualizacionEmprendimiento extends Mailable
 {
     use Queueable, SerializesModels;
     public $nombreUsuario;
@@ -31,7 +31,7 @@ class EnviarEmprendimiento extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Revisión de Emprendimiento - Bolsa de Empleo UTLVTE',
+            subject: 'Revisión de Actualización de Emprendimiento - Bolsa de Empleo UTLVTE',
         );
     }
 
@@ -56,11 +56,11 @@ class EnviarEmprendimiento extends Mailable
     }
     public function build()
     {
-        return $this->from('no-reply@utelvt.edu.ec', 'Sistema de Emprendimientos') 
+        return $this->from('no-reply@utelvt.edu.ec', 'Revisor de Emprendimientos')
                     ->to('vinculacion@utelvt.edu.ec') 
                     ->replyTo($this->correoUsuario, $this->nombreUsuario)
-        ->subject('Revisión de Emprendimiento - Bolsa de Empleo UTLVTE')
-        ->view('mails.enviar-emprendimiento')
+        ->subject('Revisión de Actualización de Emprendimiento - Bolsa de Empleo UTLVTE')
+        ->view('mails.enviar-actualizar-emprendimiento')
         ->with(['nombreUsuario' => $this->nombreUsuario,
             'nombreEmprendimiento' => $this->nombreEmprendimiento]);
     }

@@ -42,6 +42,7 @@ use App\Http\Controllers\Oferta_Emprendimientos2Controller;
 use App\Http\Controllers\EnviarComentarioController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InformacionPersonalDController;
+use App\Http\Controllers\EmailEnviarActualizarEmprenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,6 +105,7 @@ Route::prefix('b_e')->group(function () {
     Route::post('vin/enviar-aceptacion-postulacion', [EmailController::class, 'enviarAceptacionPostulacion']);
     Route::post('vin/enviar-rechazo-postulacion', [EmailRechazoController::class, 'enviarrechazoPostulacion']);
     Route::post('vin/revision-emprendimiento', [EmailEnviarEmprenController::class, 'enviarrevisionEmprendimiento']);
+    Route::post('vin/revision-actualizacion-emprendimiento', [EmailEnviarActualizarEmprenController::class, 'enviarrevisionacEmprendimiento']);
     Route::delete('vin/eliminar-postulacion/{id}', [EliminarPostulacionController::class, 'eliminarPostulacion']);
 
     //Login
