@@ -76,8 +76,9 @@
         <!-- Footer -->
         <p class="footer">
             Si no solicitaste este correo, por favor ignóralo.<br>
-            Este código es válido solo por unos minutos para proteger tu información.<br><br>
+            Este código es válido solo por unos minutos para proteger tu información.<br><br><em>Nota: No respondas a este correo, ya que ha sido generado automáticamente.</em><br><br>
             Atentamente,<br>
+           
             <strong>BOLSA-EMPLEO UTLVTE</strong>
         </p>
     </div>

@@ -26,10 +26,12 @@ class ConstOfertEmprenidimientosController extends Controller
                 'be_oferta_empleos_empre.jornada',
                 'be_oferta_empleos_empre.modalidad',
                 'be_oferta_empleos_empre.tipo_contrato',
+                'be_oferta_empleos_empre.estado_ofert_empr',
                 'informacionpersonal.ApellInfPer',
                 'informacionpersonal.ApellMatInfPer',
                 'informacionpersonal.NombInfPer',
-                'be_oferta_empleos_empre.created_at'
+                'be_oferta_empleos_empre.created_at',
+                'be_oferta_empleos_empre.updated_at'
             )
                 ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
                 ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
@@ -96,11 +98,13 @@ class ConstOfertEmprenidimientosController extends Controller
                 'be_oferta_empleos_empre.jornada',
                 'be_oferta_empleos_empre.modalidad',
                 'be_oferta_empleos_empre.tipo_contrato',
+                'be_oferta_empleos_empre.estado_ofert_empr',
                 'be_oferta_empleos_empre.requisistos as Requisitos',
                 'informacionpersonal.ApellInfPer',
                 'informacionpersonal.ApellMatInfPer',
                 'informacionpersonal.NombInfPer',
-                'be_oferta_empleos_empre.created_at'
+                'be_oferta_empleos_empre.created_at',
+                'be_oferta_empleos_empre.updated_at'
             )
                 ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
                 ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer')

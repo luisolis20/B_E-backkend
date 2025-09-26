@@ -9,20 +9,22 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class EnviarActualizacionEmprendimiento extends Mailable
+class EnviarOfertaEmprendimiento extends Mailable
 {
     use Queueable, SerializesModels;
     public $nombreUsuario;
     public $nombreEmprendimiento;
     public $correoUsuario;
+    public $nombreOferta;
     /**
      * Create a new message instance.
      */
-    public function __construct($nombreUsuario, $nombreEmprendimiento, $correoUsuario)
+    public function __construct($nombreUsuario, $nombreEmprendimiento, $correoUsuario, $nombreOferta)
     {
         $this->nombreUsuario = $nombreUsuario;
         $this->nombreEmprendimiento = $nombreEmprendimiento;
         $this->correoUsuario = $correoUsuario;
+        $this->nombreOferta = $nombreOferta;
     }
 
     /**
@@ -31,7 +33,7 @@ class EnviarActualizacionEmprendimiento extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Revisión de Actualización de Emprendimiento - Bolsa de Empleo UTLVTE',
+            subject: 'Revisión de Oferta Laboral de Emprendimiento - Bolsa de Empleo UTLVTE',
         );
     }
 
@@ -41,7 +43,7 @@ class EnviarActualizacionEmprendimiento extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.enviar-actualizar-emprendimiento',
+            view: 'mails.enviar-oferta-emprendimiento',
         );
     }
 
@@ -56,12 +58,13 @@ class EnviarActualizacionEmprendimiento extends Mailable
     }
     public function build()
     {
-        return $this->from('no-reply@utelvt.edu.ec', 'Revisor de Emprendimientos')
+        return $this->from('no-reply@utelvt.edu.ec', 'Sistema de Emprendimientos') 
                     ->to('vinculacion@utelvt.edu.ec') 
                     ->replyTo($this->correoUsuario, $this->nombreUsuario)
-        ->subject('Revisión de Actualización de Emprendimiento - Bolsa de Empleo UTLVTE')
-        ->view('mails.enviar-actualizar-emprendimiento')
+        ->subject('Revisión de Oferta Laboral de Emprendimiento - Bolsa de Empleo UTLVTE')
+        ->view('enviar-oferta-emprendimiento')
         ->with(['nombreUsuario' => $this->nombreUsuario,
-            'nombreEmprendimiento' => $this->nombreEmprendimiento]);
+            'nombreEmprendimiento' => $this->nombreEmprendimiento,
+            'nombreOferta' => $this->nombreOferta]);
     }
 }

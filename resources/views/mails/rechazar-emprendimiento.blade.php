@@ -20,8 +20,7 @@
             padding: 40px 30px;
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
             text-align: center;
-            border-top: 6px solid #2e7d32;
-            /* Verde institucional */
+            border-top: 6px solid #c62828; /* Rojo para denotar rechazo */
         }
 
         .logo {
@@ -32,7 +31,7 @@
         .title {
             font-size: 28px;
             font-weight: 700;
-            color: #2e7d32;
+            color: #c62828;
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -46,17 +45,17 @@
         }
 
         .highlight {
-            color: #2e7d32;
+            color: #c62828;
             font-weight: bold;
         }
 
         .message-box {
-            background: #e8f5e9;
+            background: #ffebee;
             padding: 18px 25px;
             border-radius: 8px;
             font-size: 18px;
             font-weight: 600;
-            color: #2e7d32;
+            color: #c62828;
             margin: 25px 0;
             box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
         }
@@ -103,28 +102,29 @@
         <img src="{{ $message->embed(public_path('img/LOGOGRANDE.png')) }}" alt="Logo" class="logo">
         
         <!-- Título -->
-        <h1 class="title">¡Postulación Aceptada!</h1>
+        <h1 class="title">Emprendimiento No Aprobado</h1>
         
         <!-- Subtítulo / Descripción -->
         <p class="subtitle">
             Estimado/a <span class="highlight">{{ $nombreUsuario }}</span>, <br><br>
-            Nos complace informarte que la empresa <span class="highlight">{{ $nombreEmpresa }}</span>
-            ha aceptado tu postulación para la oferta de empleo
-            <span class="highlight">“{{ $nombreOferta }}”</span>.
+            Tras la revisión de tu emprendimiento denominado:<br><br>
+            <span class="highlight">“{{ $nombreEmprendimiento }}”</span><br><br>
+            Lamentamos informarte que en esta ocasión <strong>no ha sido aprobado</strong> para su publicación en la plataforma de la <strong>Bolsa de Empleo UTLVTE</strong>.
         </p>
         
         <!-- Mensaje destacado -->
         <div class="message-box">
-            🎉 ¡Te deseamos mucho éxito en esta gran oportunidad laboral!
+            ❌ Te invitamos a revisar los requisitos y volver a intentarlo en el futuro.
         </div>
         
         <!-- Botón de acción -->
-        <a href="http://vinculacionconlasociedad.utelvt.edu.ec/b_e" class="button">Ir a la Bolsa de Empleo</a>
+        <a href="http://vinculacionconlasociedad.utelvt.edu.ec/b_e" class="button">Ver requisitos</a>
         
         <!-- Footer -->
         <p class="footer">
-            La UTLVTE crea oportunidades de empleo para sus estudiantes, y estamos felices de que hayas decidido participar en ellas.<br>
-            Si tienes alguna duda o inconveniente con tu postulación, no dudes en ponerte en contacto con nosotros.<br><br> <em>Nota: No respondas a este correo, ya que ha sido generado automáticamente.</em><br><br>
+            La UTLVTE apoya e impulsa los proyectos y emprendimientos de sus estudiantes, docentes y comunidad.<br>
+            Si deseas más información sobre los criterios de aprobación, por favor contáctanos.<br><br>
+            <em>Nota: No respondas a este correo, ya que ha sido generado automáticamente.</em><br><br>
             Atentamente,<br>
             <strong>BOLSA DE EMPLEO UTLVTE</strong><br>
             <img src="{{ $message->embed(public_path('img/footer.png')) }}" alt="Footer" class="footer-img">

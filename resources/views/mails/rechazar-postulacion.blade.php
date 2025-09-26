@@ -110,7 +110,8 @@
         <!-- Footer -->
         <p class="footer">
             La UTLVTE promueve constantemente nuevas oportunidades de empleo para sus estudiantes. <br>
-            Te invitamos a seguir postulando en otras ofertas que se ajusten a tu perfil. <br><br> Nota: No respona a este correo, ya que es un registro de contacto.<br>
+            Te invitamos a seguir postulando en otras ofertas que se ajusten a tu perfil. <br><br> <em>Nota: No respondas a este correo, ya que ha sido generado automáticamente.</em><br><br>
+            
             Atentamente,<br>
             <strong>BOLSA DE EMPLEO UTLVTE</strong><br>
             <img src="{{ $message->embed(public_path('img/footer.png')) }}" alt="Footer" class="footer-img">

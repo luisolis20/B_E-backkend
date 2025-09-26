@@ -151,7 +151,7 @@ class ConsultaControllerEmprendimiento extends Controller
             }else{
                 return response()->json([
                     'data'=>$data,
-                    'mensaje'=>"La Empresa no existe (puede que ya la haya eliminado)",
+                    'mensaje'=>"El emprendimiento no existe (puede que ya la haya eliminado)",
                 ]);
             }
            
@@ -160,7 +160,7 @@ class ConsultaControllerEmprendimiento extends Controller
         }else{
             return response()->json([
                 'error'=>true,
-                'mensaje'=>"La Empresa con id: $id no Existe",
+                'mensaje'=>"El emprendimiento con id: $id no Existe",
             ]);
         }
     }
@@ -168,7 +168,7 @@ class ConsultaControllerEmprendimiento extends Controller
     {
         $res = Emprendimientos::find($id);
         if(isset($res)){
-             $res->estado_empren = 2;
+             $res->estado_empren = 1;
             $res->save();
             $data = $res->toArray();
             if (!empty($res->fotografia)) {
@@ -178,12 +178,12 @@ class ConsultaControllerEmprendimiento extends Controller
            
                 return response()->json([
                     'data'=>$data,
-                    'mensaje'=>"Eliminado con Éxito!!",
+                    'mensaje'=>"Habilitado con Éxito!!",
                 ]);
             }else{
                 return response()->json([
                     'data'=>$data,
-                    'mensaje'=>"La Empresa no existe (puede que ya la haya eliminado)",
+                    'mensaje'=>"EL Emprendimiento no existe (puede que ya la haya eliminado)",
                 ]);
             }
            
@@ -192,7 +192,7 @@ class ConsultaControllerEmprendimiento extends Controller
         }else{
             return response()->json([
                 'error'=>true,
-                'mensaje'=>"La Empresa con id: $id no Existe",
+                'mensaje'=>"EL Emprendimiento con id: $id no Existe",
             ]);
         }
     }

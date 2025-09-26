@@ -43,6 +43,11 @@ use App\Http\Controllers\EnviarComentarioController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InformacionPersonalDController;
 use App\Http\Controllers\EmailEnviarActualizarEmprenController;
+use App\Http\Controllers\EmailAprobarEmprendimientoController;
+use App\Http\Controllers\EmailRechazarEmprendimientoController;
+use App\Http\Controllers\EmailEnviarOfertaEmprenController;
+use App\Http\Controllers\EmailAprobarOfertaEmprendimientoController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -63,12 +68,15 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource("vin/empresas",EmpresaController::class);
     Route::delete("vin/empresashabi/{id}",[EmpresaController::class, 'habilitar']);
     Route::get("vin/empresasEM/{id}",[EmpresaController::class, 'ver_empresa']);
+    Route::get("vin/view-emprendimiento/{id}",[EmprendimientosEController::class, 'ver_emprendimiento']);
     Route::apiResource("vin/emprendimientos_E",EmprendimientosEController::class);
     Route::apiResource("vin/users",UserController::class);
     Route::delete("vin/usershabi/{id}",[UserController::class, 'habilitar']);
     Route::apiResource("vin/oferta__empleos",Oferta_EmpleoController::class);
     Route::delete("vin/oferta__empleoshabi/{id}",[Oferta_EmpleoController::class, 'habilitar']);
     Route::apiResource("vin/oferta_empleos_emprendimiento",Oferta_EmprendimientosController::class);//Emprendimiento
+    Route::delete("vin/oferta_empleos_emprendimientohabi/{id}",[Oferta_EmprendimientosController::class, 'habilitar']);
+    Route::get("vin/view-oferta_empleos_emprendimiento/{id}",[Oferta_EmprendimientosController::class, 'ver_oferta_emprendimiento']);
     Route::apiResource("vin/oferta__empleos2",Oferta_Empleo2Controller::class);
     Route::apiResource("vin/oferta_empleos_emprendimientos2",Oferta_Emprendimientos2Controller::class);//Emprendimiento
     Route::apiResource("vin/postulacions",PostulacionController::class);
@@ -103,8 +111,12 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource('vin/estadopostuser2empr',ConstEstadoEMprendimientoPOST2Controller::class);
     Route::post('vin/enviar-correo', [CorreoController::class, 'enviarCorreo']);
     Route::post('vin/enviar-aceptacion-postulacion', [EmailController::class, 'enviarAceptacionPostulacion']);
+    Route::post('vin/enviar-aprobacion-emprendimiento', [EmailAprobarEmprendimientoController::class, 'enviaraprobarEmprendimiento']);
+    Route::post('vin/enviar-aprobacion-oferta-emprendimiento', [EmailAprobarOfertaEmprendimientoController::class, 'enviaraprobarofertaEmprendimiento']);
+    Route::post('vin/enviar-rechazo-emprendimiento', [EmailRechazarEmprendimientoController::class, 'enviarrechazoEmprendimiento']);
     Route::post('vin/enviar-rechazo-postulacion', [EmailRechazoController::class, 'enviarrechazoPostulacion']);
     Route::post('vin/revision-emprendimiento', [EmailEnviarEmprenController::class, 'enviarrevisionEmprendimiento']);
+    Route::post('vin/revision-oferta-emprendimiento', [EmailEnviarOfertaEmprenController::class, 'enviarrevisionofertaEmprendimiento']);
     Route::post('vin/revision-actualizacion-emprendimiento', [EmailEnviarActualizarEmprenController::class, 'enviarrevisionacEmprendimiento']);
     Route::delete('vin/eliminar-postulacion/{id}', [EliminarPostulacionController::class, 'eliminarPostulacion']);
 

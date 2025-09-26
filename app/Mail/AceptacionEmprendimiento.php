@@ -9,20 +9,18 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class EnviarActualizacionEmprendimiento extends Mailable
+class AceptacionEmprendimiento extends Mailable
 {
     use Queueable, SerializesModels;
     public $nombreUsuario;
     public $nombreEmprendimiento;
-    public $correoUsuario;
     /**
      * Create a new message instance.
      */
-    public function __construct($nombreUsuario, $nombreEmprendimiento, $correoUsuario)
+    public function __construct($nombreUsuario, $nombreEmprendimiento)
     {
         $this->nombreUsuario = $nombreUsuario;
         $this->nombreEmprendimiento = $nombreEmprendimiento;
-        $this->correoUsuario = $correoUsuario;
     }
 
     /**
@@ -31,7 +29,7 @@ class EnviarActualizacionEmprendimiento extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Revisión de Actualización de Emprendimiento - Bolsa de Empleo UTLVTE',
+            subject: 'Emprenidmiento Aceptado - Bolsa de Empleo UTLVTE',
         );
     }
 
@@ -41,7 +39,7 @@ class EnviarActualizacionEmprendimiento extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.enviar-actualizar-emprendimiento',
+            view: 'mails.aprobar-emprendimiento',
         );
     }
 
@@ -56,11 +54,8 @@ class EnviarActualizacionEmprendimiento extends Mailable
     }
     public function build()
     {
-        return $this->from('no-reply@utelvt.edu.ec', 'Revisor de Emprendimientos')
-                    ->to('vinculacion@utelvt.edu.ec') 
-                    ->replyTo($this->correoUsuario, $this->nombreUsuario)
-        ->subject('Revisión de Actualización de Emprendimiento - Bolsa de Empleo UTLVTE')
-        ->view('mails.enviar-actualizar-emprendimiento')
+        return $this->subject('Emprendimiento Aceptado - Bolsa de Empleo UTLVTE')
+        ->view('mails.aprobar-emprendimiento')
         ->with(['nombreUsuario' => $this->nombreUsuario,
             'nombreEmprendimiento' => $this->nombreEmprendimiento]);
     }

@@ -20,8 +20,7 @@
             padding: 40px 30px;
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
             text-align: center;
-            border-top: 6px solid #2e7d32;
-            /* Verde institucional */
+            border-top: 6px solid #2e7d32; /* Verde institucional */
         }
 
         .logo {
@@ -103,28 +102,30 @@
         <img src="{{ $message->embed(public_path('img/LOGOGRANDE.png')) }}" alt="Logo" class="logo">
         
         <!-- Título -->
-        <h1 class="title">¡Postulación Aceptada!</h1>
+        <h1 class="title">¡Oferta de Emprendimiento Aprobado!</h1>
         
         <!-- Subtítulo / Descripción -->
         <p class="subtitle">
             Estimado/a <span class="highlight">{{ $nombreUsuario }}</span>, <br><br>
-            Nos complace informarte que la empresa <span class="highlight">{{ $nombreEmpresa }}</span>
-            ha aceptado tu postulación para la oferta de empleo
-            <span class="highlight">“{{ $nombreOferta }}”</span>.
+            Nos complace informarte que la <strong>UTLVTE</strong> y la <strong>Dirección de Vinculación con la Sociedad</strong> 
+            han aprobado tu oferta de emprendimiento denominada:<br><br>
+            <span class="highlight">“{{ $nombreOferta }}”</span><br><br>
+            El mismo ha sido publicado en la plataforma de la <strong>Bolsa de Empleo</strong>. Ahora podrás aceptar postulaciones.
         </p>
         
         <!-- Mensaje destacado -->
         <div class="message-box">
-            🎉 ¡Te deseamos mucho éxito en esta gran oportunidad laboral!
+            🎉 ¡Felicitaciones! Te deseamos mucho éxito en este gran logro y en el crecimiento de tu emprendimiento.
         </div>
         
         <!-- Botón de acción -->
-        <a href="http://vinculacionconlasociedad.utelvt.edu.ec/b_e" class="button">Ir a la Bolsa de Empleo</a>
+        <a href="http://vinculacionconlasociedad.utelvt.edu.ec/b_e" class="button">Ver en la Bolsa de Empleo</a>
         
         <!-- Footer -->
         <p class="footer">
-            La UTLVTE crea oportunidades de empleo para sus estudiantes, y estamos felices de que hayas decidido participar en ellas.<br>
-            Si tienes alguna duda o inconveniente con tu postulación, no dudes en ponerte en contacto con nosotros.<br><br> <em>Nota: No respondas a este correo, ya que ha sido generado automáticamente.</em><br><br>
+            La UTLVTE apoya e impulsa los proyectos y emprendimientos de sus estudiantes, docentes y comunidad.<br>
+            Gracias por confiar en nosotros para difundir tu iniciativa. <br><br>
+            <em>Nota: No respondas a este correo, ya que ha sido generado automáticamente.</em><br><br>
             Atentamente,<br>
             <strong>BOLSA DE EMPLEO UTLVTE</strong><br>
             <img src="{{ $message->embed(public_path('img/footer.png')) }}" alt="Footer" class="footer-img">
