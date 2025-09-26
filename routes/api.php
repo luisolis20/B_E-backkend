@@ -47,6 +47,7 @@ use App\Http\Controllers\EmailAprobarEmprendimientoController;
 use App\Http\Controllers\EmailRechazarEmprendimientoController;
 use App\Http\Controllers\EmailEnviarOfertaEmprenController;
 use App\Http\Controllers\EmailAprobarOfertaEmprendimientoController;
+use App\Http\Controllers\EmailRechazarOfertaEmprendimientoController;
 
 
 /*
@@ -114,6 +115,7 @@ Route::prefix('b_e')->group(function () {
     Route::post('vin/enviar-aprobacion-emprendimiento', [EmailAprobarEmprendimientoController::class, 'enviaraprobarEmprendimiento']);
     Route::post('vin/enviar-aprobacion-oferta-emprendimiento', [EmailAprobarOfertaEmprendimientoController::class, 'enviaraprobarofertaEmprendimiento']);
     Route::post('vin/enviar-rechazo-emprendimiento', [EmailRechazarEmprendimientoController::class, 'enviarrechazoEmprendimiento']);
+    Route::post('vin/enviar-oferta-rechazo-emprendimiento', [EmailRechazarOfertaEmprendimientoController::class, 'enviarrechazoofertaEmprendimiento']);
     Route::post('vin/enviar-rechazo-postulacion', [EmailRechazoController::class, 'enviarrechazoPostulacion']);
     Route::post('vin/revision-emprendimiento', [EmailEnviarEmprenController::class, 'enviarrevisionEmprendimiento']);
     Route::post('vin/revision-oferta-emprendimiento', [EmailEnviarOfertaEmprenController::class, 'enviarrevisionofertaEmprendimiento']);
