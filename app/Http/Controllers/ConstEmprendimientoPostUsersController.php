@@ -39,7 +39,7 @@ class ConstEmprendimientoPostUsersController extends Controller
             'be_estado_postulaciones_emprend.id as estado_id',
             'be_estado_postulaciones_emprend.estado',
             'be_estado_postulaciones_emprend.detalle_estado',
-            'be_postulacions_empren.created_at'
+            'be_postulacions_empren.created_at as fecha_postulacion'
         )
             ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
             ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')

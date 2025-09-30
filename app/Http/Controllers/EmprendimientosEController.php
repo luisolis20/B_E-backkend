@@ -35,7 +35,7 @@ class EmprendimientosEController extends Controller
                 'informacionpersonal.ApellInfPer',
                 'informacionpersonal.ApellMatInfPer',
                 'informacionpersonal.NombInfPer',
-                DB::raw('COUNT(be_oferta_empleos_empre.id) as total_ofertas') // 🔹 
+                DB::raw('COUNT(be_oferta_empleos_empre.id) as total_ofertas'), // 🔹 
             )
                 ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_emprendimientos.CIInfPer')
                 ->leftJoin('be_oferta_empleos_empre', 'be_oferta_empleos_empre.emprendimiento_id', '=', 'be_emprendimientos.id') // 🔹
@@ -73,6 +73,7 @@ class EmprendimientosEController extends Controller
                     }
                     return $attributes;
                 });
+                
 
                 return response()->json(['data' => $data]);
             }
