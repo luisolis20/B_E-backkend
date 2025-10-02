@@ -18,7 +18,9 @@ class ConstOfertEmprenidimientosController extends Controller
                 'be_oferta_empleos_empre.id',
                 'be_oferta_empleos_empre.emprendimiento_id',
                 'be_emprendimientos.nombre_emprendimiento as Empresa',
+                'be_emprendimientos.logo',
                 'be_emprendimientos.fotografia',
+                'be_emprendimientos.fotografia2',
                 'be_oferta_empleos_empre.titulo',
                 'be_oferta_empleos_empre.descripcion',
                 'be_oferta_empleos_empre.categoria',
@@ -41,13 +43,13 @@ class ConstOfertEmprenidimientosController extends Controller
             }
 
             // Convertir los campos a UTF-8 válido para cada página
-            $data->getCollection()->transform(function ($item) {
+             $data->getCollection()->transform(function ($item) {
                 $attributes = $item->getAttributes();
                 foreach ($attributes as $key => $value) {
-                    if ($key === 'fotografia' && !empty($value)) {
+                    if (in_array($key, ['logo', 'fotografia', 'fotografia2']) && !empty($value)) {
                         // ✅ Convertir BLOB a base64
                         $attributes[$key] = base64_encode($value);
-                    } elseif (is_string($value) && $key !== 'fotografia') {
+                    } elseif (is_string($value) && !in_array($key, ['fotografia', 'logo', 'fotografia2'])) {
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
@@ -86,7 +88,9 @@ class ConstOfertEmprenidimientosController extends Controller
                 'be_oferta_empleos_empre.id',
                 'be_oferta_empleos_empre.emprendimiento_id',
                 'be_emprendimientos.nombre_emprendimiento as Empresa',
+                'be_emprendimientos.logo',
                 'be_emprendimientos.fotografia',
+                'be_emprendimientos.fotografia2',
                 'be_emprendimientos.telefono_contacto',
                 'be_emprendimientos.direccion',
                 'be_emprendimientos.sitio_web',
@@ -118,10 +122,10 @@ class ConstOfertEmprenidimientosController extends Controller
             $data->getCollection()->transform(function ($item) {
                 $attributes = $item->getAttributes();
                 foreach ($attributes as $key => $value) {
-                    if ($key === 'fotografia' && !empty($value)) {
+                    if (in_array($key, ['logo', 'fotografia', 'fotografia2']) && !empty($value)) {
                         // ✅ Convertir BLOB a base64
                         $attributes[$key] = base64_encode($value);
-                    } elseif (is_string($value) && $key !== 'fotografia') {
+                    } elseif (is_string($value) && !in_array($key, ['fotografia', 'logo', 'fotografia2'])) {
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }

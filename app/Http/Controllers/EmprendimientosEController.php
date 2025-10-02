@@ -73,7 +73,7 @@ class EmprendimientosEController extends Controller
                     }
                     return $attributes;
                 });
-                
+
 
                 return response()->json(['data' => $data]);
             }
@@ -89,15 +89,16 @@ class EmprendimientosEController extends Controller
             $data->getCollection()->transform(function ($item) {
                 $attributes = $item->getAttributes();
                 foreach ($attributes as $key => $value) {
-                    if ($key === 'fotografia' && !empty($value)) {
+                    if (in_array($key, ['logo', 'fotografia', 'fotografia2']) && !empty($value)) {
                         // ✅ Convertir BLOB a base64
                         $attributes[$key] = base64_encode($value);
-                    } elseif (is_string($value) && $key !== 'fotografia') {
+                    } elseif (is_string($value) && !in_array($key, ['fotografia', 'logo', 'fotografia2'])) {
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
                 return $attributes;
             });
+
 
             // Retornar respuesta JSON con metadatos de paginación
             return response()->json([
@@ -118,14 +119,26 @@ class EmprendimientosEController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
+        if (!empty($inputs['logo'])) {
+            $inputs['logo'] = base64_decode($inputs['logo']);
+        }
         if (!empty($inputs['fotografia'])) {
             $inputs['fotografia'] = base64_decode($inputs['fotografia']);
+        }
+        if (!empty($inputs['fotografia2'])) {
+            $inputs['fotografia2'] = base64_decode($inputs['fotografia2']);
         }
         $res = Emprendimientos::create($inputs);
         // Clonar el modelo y convertir fotografia en base64
         $data = $res->toArray();
+        if (!empty($res->logo)) {
+            $data['logo'] = base64_encode($res->logo);
+        }
         if (!empty($res->fotografia)) {
             $data['fotografia'] = base64_encode($res->fotografia);
+        }
+        if (!empty($res->fotografia2)) {
+            $data['fotografia2'] = base64_encode($res->fotografia2);
         }
 
         return response()->json([
@@ -195,15 +208,16 @@ class EmprendimientosEController extends Controller
         $data->getCollection()->transform(function ($item) {
             $attributes = $item->getAttributes();
             foreach ($attributes as $key => $value) {
-                if ($key === 'fotografia' && !empty($value)) {
-                    // Convertir BLOB a base64
+                if (in_array($key, ['logo', 'fotografia', 'fotografia2']) && !empty($value)) {
+                    // ✅ Convertir BLOB a base64
                     $attributes[$key] = base64_encode($value);
-                } elseif (is_string($value) && $key !== 'fotografia') {
+                } elseif (is_string($value) && !in_array($key, ['fotografia', 'logo', 'fotografia2'])) {
                     $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                 }
             }
             return $attributes;
         });
+
 
         // Retornar la respuesta JSON con los metadatos de paginación
         try {
@@ -276,15 +290,16 @@ class EmprendimientosEController extends Controller
         $data->getCollection()->transform(function ($item) {
             $attributes = $item->getAttributes();
             foreach ($attributes as $key => $value) {
-                if ($key === 'fotografia' && !empty($value)) {
-                    // Convertir BLOB a base64
+                if (in_array($key, ['logo', 'fotografia', 'fotografia2']) && !empty($value)) {
+                    // ✅ Convertir BLOB a base64
                     $attributes[$key] = base64_encode($value);
-                } elseif (is_string($value) && $key !== 'fotografia') {
+                } elseif (is_string($value) && !in_array($key, ['fotografia', 'logo', 'fotografia2'])) {
                     $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                 }
             }
             return $attributes;
         });
+
 
         // Retornar la respuesta JSON con los metadatos de paginación
         try {
@@ -311,9 +326,15 @@ class EmprendimientosEController extends Controller
             $res->CIInfPer = $request->CIInfPer;
             $res->nombre_emprendimiento = $request->nombre_emprendimiento;
             $res->descripcion = $request->descripcion;
+            if (!empty($request->logo)) {
+                $res->logo = base64_decode($request->logo);
+            }
             if (!empty($request->fotografia)) {
                 $res->fotografia = base64_decode($request->fotografia);
             }
+            if (!empty($request->fotografia2)) {
+                $res->fotografia2 = base64_decode($request->fotografia2);
+            }       
             $res->tiempo_emprendimiento = $request->tiempo_emprendimiento;
             $res->horarios_atencion = $request->horarios_atencion;
             $res->direccion = $request->direccion;
@@ -324,9 +345,16 @@ class EmprendimientosEController extends Controller
             $res->estado_empren = $request->estado_empren;
             if ($res->save()) {
                 $data = $res->toArray();
+                if (!empty($res->logo)) {
+                    $data['logo'] = base64_encode($res->logo);
+                }
                 if (!empty($res->fotografia)) {
                     $data['fotografia'] = base64_encode($res->fotografia);
                 }
+                if (!empty($res->fotografia2)) {
+                    $data['fotografia2'] = base64_encode($res->fotografia2);
+                }
+
                 return response()->json([
                     'data' => $data,
                     'mensaje' => "Actualizado con Éxito!!",

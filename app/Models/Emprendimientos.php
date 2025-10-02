@@ -18,7 +18,9 @@ class Emprendimientos extends Model
         'CIInfPer',
         'nombre_emprendimiento',
         'descripcion',
+        'logo',
         'fotografia',
+        'fotografia2',
         'tiempo_emprendimiento',
         'horarios_atencion',
         'direccion',
@@ -38,6 +40,6 @@ class Emprendimientos extends Model
     // Relación con la tabla interacciones_emprendimientos
     public function interacciones()
     {
-        return $this->hasMany(InteraccionesEmprendimiento::class, 'emprendimiento_id', 'id');
+        return $this->hasMany(Oferta_Empleo_Empre::class, 'emprendimiento_id', 'id');
     }
 }

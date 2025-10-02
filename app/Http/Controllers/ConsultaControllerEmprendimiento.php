@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Emprendimientos;
 use Illuminate\Http\Request;
 
 class ConsultaControllerEmprendimiento extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      */
@@ -38,10 +39,10 @@ class ConsultaControllerEmprendimiento extends Controller
         $data->getCollection()->transform(function ($item) {
             $attributes = $item->getAttributes();
             foreach ($attributes as $key => $value) {
-                if ($key === 'fotografia' && !empty($value)) {
+                if (in_array($key, ['logo', 'fotografia', 'fotografia2']) && !empty($value)) {
                     // ✅ Convertir BLOB a base64
                     $attributes[$key] = base64_encode($value);
-                } elseif (is_string($value) && $key !== 'fotografia') {
+                } elseif (is_string($value) && !in_array($key, ['fotografia', 'logo', 'fotografia2'])) {
                     $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                 }
             }
@@ -86,17 +87,21 @@ class ConsultaControllerEmprendimiento extends Controller
      */
     public function update(Request $request, string $id)
     {
-        
-       $res = Emprendimientos::find($id);
+
+        $res = Emprendimientos::find($id);
         if (isset($res)) {
             $res->ruc = $request->ruc;
             $res->CIInfPer = $request->CIInfPer;
             $res->nombre_emprendimiento = $request->nombre_emprendimiento;
             $res->descripcion = $request->descripcion;
-            if (!empty($res->fotografia)) {
-                $res->fotografia = base64_decode($res->fotografia);
-            } else {
-                $res->fotografia = null;
+            if (!empty($request->logo)) {
+                $res->logo = base64_decode($request->logo);
+            }
+            if (!empty($request->fotografia)) {
+                $res->fotografia = base64_decode($request->fotografia);
+            }
+            if (!empty($request->fotografia2)) {
+                $res->fotografia2 = base64_decode($request->fotografia2);
             }
             $res->tiempo_emprendimiento = $request->tiempo_emprendimiento;
             $res->horarios_atencion = $request->horarios_atencion;
@@ -108,8 +113,14 @@ class ConsultaControllerEmprendimiento extends Controller
             $res->estado_empren = $request->estado_empren;
             if ($res->save()) {
                 $data = $res->toArray();
+                if (!empty($res->logo)) {
+                    $data['logo'] = base64_encode($res->logo);
+                }
                 if (!empty($res->fotografia)) {
                     $data['fotografia'] = base64_encode($res->fotografia);
+                }
+                if (!empty($res->fotografia2)) {
+                    $data['fotografia2'] = base64_encode($res->fotografia2);
                 }
                 return response()->json([
                     'data' => $data,
@@ -135,66 +146,71 @@ class ConsultaControllerEmprendimiento extends Controller
     public function destroy(string $id)
     {
         $res = Emprendimientos::find($id);
-        if(isset($res)){
-             $res->estado_empren = 0;
+        if (isset($res)) {
+            $res->estado_empren = 0;
             $res->save();
             $data = $res->toArray();
+            if (!empty($res->logo)) {
+                $data['logo'] = base64_encode($res->logo);
+            }
             if (!empty($res->fotografia)) {
                 $data['fotografia'] = base64_encode($res->fotografia);
             }
-            if($data){
-           
+            if (!empty($res->fotografia2)) {
+                $data['fotografia2'] = base64_encode($res->fotografia2);
+            }
+            if ($data) {
+
                 return response()->json([
-                    'data'=>$data,
-                    'mensaje'=>"Inhabilitado con Éxito!!",
+                    'data' => $data,
+                    'mensaje' => "Inhabilitado con Éxito!!",
                 ]);
-            }else{
+            } else {
                 return response()->json([
-                    'data'=>$data,
-                    'mensaje'=>"El emprendimiento no existe (puede que ya la haya eliminado)",
+                    'data' => $data,
+                    'mensaje' => "El emprendimiento no existe (puede que ya la haya eliminado)",
                 ]);
             }
-           
-           
-           
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"El emprendimiento con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "El emprendimiento con id: $id no Existe",
             ]);
         }
     }
     public function habilitar(string $id)
     {
         $res = Emprendimientos::find($id);
-        if(isset($res)){
-             $res->estado_empren = 1;
+        if (isset($res)) {
+            $res->estado_empren = 1;
             $res->save();
             $data = $res->toArray();
+            if (!empty($res->logo)) {
+                $data['logo'] = base64_encode($res->logo);
+            }
             if (!empty($res->fotografia)) {
                 $data['fotografia'] = base64_encode($res->fotografia);
             }
-            if($data){
-           
+            if (!empty($res->fotografia2)) {
+                $data['fotografia2'] = base64_encode($res->fotografia2);
+            }
+            if ($data) {
+
                 return response()->json([
-                    'data'=>$data,
-                    'mensaje'=>"Habilitado con Éxito!!",
+                    'data' => $data,
+                    'mensaje' => "Habilitado con Éxito!!",
                 ]);
-            }else{
+            } else {
                 return response()->json([
-                    'data'=>$data,
-                    'mensaje'=>"EL Emprendimiento no existe (puede que ya la haya eliminado)",
+                    'data' => $data,
+                    'mensaje' => "EL Emprendimiento no existe (puede que ya la haya eliminado)",
                 ]);
             }
-           
-           
-           
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"EL Emprendimiento con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "EL Emprendimiento con id: $id no Existe",
             ]);
         }
     }
-    
 }

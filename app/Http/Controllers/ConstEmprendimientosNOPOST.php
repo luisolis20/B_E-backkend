@@ -28,7 +28,9 @@ class ConstEmprendimientosNOPOST extends Controller
             'be_oferta_empleos_empre.id',
             'be_oferta_empleos_empre.emprendimiento_id',
             'be_emprendimientos.nombre_emprendimiento as Empresa',
-            'be_emprendimientos.fotografia',
+            'be_emprendimientos.logo',
+                'be_emprendimientos.fotografia',
+                'be_emprendimientos.fotografia2',
             'be_oferta_empleos_empre.titulo',
             'be_oferta_empleos_empre.descripcion',
             'be_oferta_empleos_empre.categoria',
@@ -58,9 +60,10 @@ class ConstEmprendimientosNOPOST extends Controller
             $data->transform(function ($item) {
                 $attributes = $item->getAttributes();
                 foreach ($attributes as $key => $value) {
-                    if ($key === 'fotografia' && !empty($value)) {
-                        $attributes[$key] = base64_encode($value); // ✅ Convertir BLOB a base64
-                    } elseif (is_string($value) && $key !== 'fotografia') {
+                    if (in_array($key, ['logo', 'fotografia', 'fotografia2']) && !empty($value)) {
+                        // ✅ Convertir BLOB a base64
+                        $attributes[$key] = base64_encode($value);
+                    } elseif (is_string($value) && !in_array($key, ['fotografia', 'logo', 'fotografia2'])) {
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
