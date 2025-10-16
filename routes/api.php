@@ -52,6 +52,7 @@ use App\Http\Controllers\SeguiFormularioController;
 use App\Http\Controllers\SeguiPreguntasController;
 use App\Http\Controllers\SeguiTipoRespuestaController;
 use App\Http\Controllers\SeguiEncuestaController;
+use App\Http\Controllers\SeguiDetalleEncuestaController;
 
 
 
@@ -74,10 +75,13 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource("vin/empresas",EmpresaController::class);
     Route::apiResource("vin/seguiformulario",SeguiFormularioController::class);
     Route::apiResource("vin/seguipreguntas",SeguiPreguntasController::class);
+    Route::apiResource("vin/seguiencuesta",SeguiEncuestaController::class);
+    Route::apiResource("vin/seguidetalleencuesta",SeguiDetalleEncuestaController::class);
     Route::apiResource("vin/seguitiporespuesta",SeguiTipoRespuestaController::class);
     Route::delete("vin/empresashabi/{id}",[EmpresaController::class, 'habilitar']);
     Route::delete("vin/seguiformulariohabi/{id}",[SeguiFormularioController::class, 'habilitar']);
     Route::get("vin/empresasEM/{id}",[EmpresaController::class, 'ver_empresa']);
+    Route::get("vin/verpreg/{id}",[SeguiPreguntasController::class, 'verpreg']);
     Route::get("vin/ver_pregunta_en/{id}",[SeguiPreguntasController::class, 'ver_pregunta_en']);
     Route::get("vin/verificar_usuario_encuesta/{cedula}",[SeguiEncuestaController::class, 'verificar_usuario_encuesta']);
     Route::get("vin/seguiformularioEM/{id}",[SeguiFormularioController::class, 'ver_formulario']);

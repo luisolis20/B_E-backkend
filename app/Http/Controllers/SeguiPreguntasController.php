@@ -155,6 +155,43 @@ class SeguiPreguntasController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
+    public function verpreg(string $id)
+    {
+        $data =  SeguiPreguntas::select(
+            'seguipreguntas.*',
+        )
+            ->where('seguipreguntas.ID', $id)
+            ->paginate(20);
+
+        if ($data->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+        }
+
+        // Convertir los campos a UTF-8 válido para cada página
+        $data->getCollection()->transform(function ($item) {
+            $attributes = $item->getAttributes();
+            foreach ($attributes as $key => $value) {
+                if (is_string($value)) {
+                    $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                }
+            }
+            return $attributes;
+        });
+
+
+        // Retornar la respuesta JSON con los metadatos de paginación
+        try {
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+        }
+    }
     public function ver_pregunta_en(string $id)
     {
         try {
@@ -168,9 +205,11 @@ class SeguiPreguntasController extends Controller
                 'seguipreguntas.UD',
                 'seguipreguntas.FDEL',
                 'seguipreguntas.tipo',
-                'seguiformulario.NOMBRE'
+                'seguiformulario.NOMBRE',
+                'seguiencuesta.ID as id_encuesta',
             )
                 ->join('seguiformulario', 'seguiformulario.ID', '=', 'seguipreguntas.IDFORMULARIO')
+                ->leftJoin('seguiencuesta', 'seguiencuesta.idformulario', '=', 'seguiformulario.ID')
                 ->where('seguipreguntas.IDFORMULARIO', $id)
                 ->get();
 
@@ -199,6 +238,8 @@ class SeguiPreguntasController extends Controller
                         'pregunta' => $pregunta->PREGUNTA,
                         'tipo' => $pregunta->tipo,
                         'nombre_formulario' => $pregunta->NOMBRE,
+                        'IDFORMULARIO' => $pregunta->IDFORMULARIO,
+                        'id_encuesta' => $pregunta->id_encuesta,
                         'respuestas' => [
                             [
                                 'id_respuesta' => 0,
@@ -214,6 +255,8 @@ class SeguiPreguntasController extends Controller
                     'pregunta' => $pregunta->PREGUNTA,
                     'tipo' => $pregunta->tipo,
                     'nombre_formulario' => $pregunta->NOMBRE,
+                    'IDFORMULARIO' => $pregunta->IDFORMULARIO,
+                    'id_encuesta' => $pregunta->id_encuesta,
                     'respuestas' => $opciones->map(function ($item) {
                         return [
                             'id_respuesta' => $item->id_tipo_respuesta,

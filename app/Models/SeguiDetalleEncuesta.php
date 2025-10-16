@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SeguiDetalleEncuesta extends Model
 {
    // Nombre de la tabla en la base de datos
-    protected $table = 'seguiencuesta';
+    protected $table = 'seguidetalleencuesta';
     // Clave primaria
     protected $primaryKey = 'id';
     public $timestamps = false;
