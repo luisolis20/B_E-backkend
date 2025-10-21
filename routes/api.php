@@ -53,6 +53,9 @@ use App\Http\Controllers\SeguiPreguntasController;
 use App\Http\Controllers\SeguiTipoRespuestaController;
 use App\Http\Controllers\SeguiEncuestaController;
 use App\Http\Controllers\SeguiDetalleEncuestaController;
+use App\Http\Controllers\SedeController;
+use App\Http\Controllers\FacultadController;
+use App\Http\Controllers\CarreraController;
 
 
 
@@ -73,6 +76,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('b_e')->group(function () {
 
     Route::apiResource("vin/empresas",EmpresaController::class);
+    Route::apiResource("vin/sede",SedeController::class);
+    Route::apiResource("vin/facultad",FacultadController::class);
     Route::apiResource("vin/seguiformulario",SeguiFormularioController::class);
     Route::apiResource("vin/seguipreguntas",SeguiPreguntasController::class);
     Route::apiResource("vin/seguiencuesta",SeguiEncuestaController::class);
@@ -81,8 +86,11 @@ Route::prefix('b_e')->group(function () {
     Route::delete("vin/empresashabi/{id}",[EmpresaController::class, 'habilitar']);
     Route::delete("vin/seguiformulariohabi/{id}",[SeguiFormularioController::class, 'habilitar']);
     Route::get("vin/empresasEM/{id}",[EmpresaController::class, 'ver_empresa']);
+    Route::get("vin/carreras/{id}",[CarreraController::class, 'carrerasPorFacultad']);
+    Route::get("vin/ver_rep/{id}",[SeguiEncuestaController::class, 'ver_rep']);
+    Route::get("vin/ver_respuestas_abiertas/{id}",[SeguiEncuestaController::class, 'ver_respuestas_abiertas']);
     Route::get("vin/verpreg/{id}",[SeguiPreguntasController::class, 'verpreg']);
-    Route::get("vin/ver_pregunta_en/{id}",[SeguiPreguntasController::class, 'ver_pregunta_en']);
+    Route::get("vin/ver_pregunta_en",[SeguiPreguntasController::class, 'ver_pregunta_en']);
     Route::get("vin/verificar_usuario_encuesta/{cedula}",[SeguiEncuestaController::class, 'verificar_usuario_encuesta']);
     Route::get("vin/seguiformularioEM/{id}",[SeguiFormularioController::class, 'ver_formulario']);
     Route::get("vin/view-emprendimiento/{id}",[EmprendimientosEController::class, 'ver_emprendimiento']);

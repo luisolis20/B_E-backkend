@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SeguiEncuesta;
+use App\Models\SeguiPreguntas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -121,6 +122,134 @@ class SeguiEncuestaController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
+    public function ver_rep(string $id)
+    {
+        try {
+            $data = SeguiPreguntas::select(
+                'seguipreguntas.ID as id_pregunta',
+                'seguipreguntas.PREGUNTA as texto_pregunta',
+                'seguipreguntas.tipo',
+                'facultad.siglas as facultad',
+
+                'seguidetalleencuesta.idtiporespuesta',
+
+                DB::raw("
+                CASE 
+                    WHEN seguidetalleencuesta.idtiporespuesta = 0 
+                    THEN 'Pregunta Abierta' 
+                    ELSE seguitiporespuesta.TIPORESPUESTA 
+                END as opcion_respuesta
+            "),
+
+                DB::raw("
+                CASE 
+                    WHEN seguidetalleencuesta.idtiporespuesta = 0 
+                    THEN COUNT(seguidetalleencuesta.textorespuesta)
+                    ELSE COUNT(seguidetalleencuesta.id)
+                END as total_respuestas
+            "),
+
+                DB::raw("
+                CASE 
+                    WHEN seguidetalleencuesta.idtiporespuesta = 0 
+                    THEN GROUP_CONCAT(DISTINCT seguidetalleencuesta.textorespuesta SEPARATOR ', ')
+                    ELSE ''
+                END as detalle_respuestas
+            "),
+
+                DB::raw('COUNT(DISTINCT seguiencuesta.ID) as total_encuestas')
+            )
+                ->leftJoin('seguitiporespuesta', 'seguitiporespuesta.IDPREGUNTA', '=', 'seguipreguntas.ID')
+                ->leftJoin('seguidetalleencuesta', function ($join) {
+                    $join->on('seguidetalleencuesta.idpregunta', '=', 'seguipreguntas.ID')
+                        ->on(function ($on) {
+                            $on->whereColumn('seguidetalleencuesta.idtiporespuesta', '=', 'seguitiporespuesta.ID')
+                                ->orWhere('seguidetalleencuesta.idtiporespuesta', '=', 0);
+                        });
+                })
+                ->leftJoin('seguiencuesta', 'seguiencuesta.ID', '=', 'seguidetalleencuesta.idseguiencuesta')
+                ->leftJoin('carrera', 'carrera.idCarr', '=', 'seguiencuesta.idcarr')
+                ->leftJoin('facultad', 'facultad.idfacultad', '=', 'carrera.idfacultad')
+                ->where('seguipreguntas.IDFORMULARIO', $id)
+                ->groupBy(
+                    'seguipreguntas.ID',
+                    'seguipreguntas.PREGUNTA',
+                    'seguipreguntas.tipo',
+                    'facultad.siglas',
+                    'seguidetalleencuesta.idtiporespuesta',
+                    'seguitiporespuesta.TIPORESPUESTA'
+                )
+                ->orderBy('seguipreguntas.ID')
+                ->paginate(20);
+
+            if ($data->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            }
+
+            // Forzar codificación UTF-8 para evitar caracteres raros
+            $data->getCollection()->transform(function ($item) {
+                $attributes = $item->getAttributes();
+                foreach ($attributes as $key => $value) {
+                    if (is_string($value)) {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+                return $attributes;
+            });
+
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener los datos: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
+    public function ver_respuestas_abiertas(string $id_pregunta)
+    {
+        try {
+            $data = DB::table('seguidetalleencuesta as d')
+                ->join('seguiencuesta as e', 'e.ID', '=', 'd.idseguiencuesta')
+                ->join('seguipreguntas as p', 'p.ID', '=', 'd.idpregunta')
+                ->select(
+                    'p.ID as id_pregunta',
+                    'e.cedula_estudiante as usuario',
+                    'd.textorespuesta as respuesta'
+                )
+                ->where('d.idpregunta', $id_pregunta)
+                ->where('d.idtiporespuesta', 0) // solo abiertas
+                ->whereNotNull('d.textorespuesta')
+                ->where('d.textorespuesta', '<>', '')
+                ->get();
+
+            if ($data->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron respuestas abiertas para esta pregunta'], 404);
+            }
+
+            $data->transform(function ($item) {
+                foreach ($item as $key => $value) {
+                    if (is_string($value)) {
+                        $item->$key = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+                return $item;
+            });
+
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener respuestas abiertas: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
+
     public function verificar_usuario_encuesta($cedula)
     {
         try {

@@ -192,7 +192,7 @@ class SeguiPreguntasController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
-    public function ver_pregunta_en(string $id)
+    public function ver_pregunta_en()
     {
         try {
             // Trae todas las preguntas del formulario (aunque no tengan opciones)
@@ -210,7 +210,8 @@ class SeguiPreguntasController extends Controller
             )
                 ->join('seguiformulario', 'seguiformulario.ID', '=', 'seguipreguntas.IDFORMULARIO')
                 ->leftJoin('seguiencuesta', 'seguiencuesta.idformulario', '=', 'seguiformulario.ID')
-                ->where('seguipreguntas.IDFORMULARIO', $id)
+                ->where('seguiformulario.ACTIVO', 1)
+                ->where('seguiformulario.tipoencuesta', 'Graduados')
                 ->get();
 
             if ($preguntas->isEmpty()) {

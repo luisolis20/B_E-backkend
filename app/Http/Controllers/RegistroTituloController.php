@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\RegistroTitulos;
 use Illuminate\Http\Request;
 
@@ -17,24 +18,57 @@ class RegistroTituloController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $inputs = $request->input();
-        $res = RegistroTitulos::create($inputs);
-        return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Agregado con Éxito!!",
-        ]);
-    }
+    public function store(Request $request) {}
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        return RegistroTitulos::select('registrotitulos.*')
-        ->where('registrotitulos.ciinfper', $id)
-        ->get();
+        $data = RegistroTitulos::select(
+            'registrotitulos.*',
+            'carrera.*',
+        )
+            ->join('carrera', 'carrera.idCarr', '=', 'registrotitulos.idcarr')
+            ->where('registrotitulos.ciinfper', $id)
+            ->get();
+
+        if ($data->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron interacciones para este emprendimiento'], 404);
+        }
+
+        $data->transform(function ($item) {
+            foreach ($item->getAttributes() as $key => $value) {
+                if (is_string($value)) {
+                    $item->$key = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                }
+            }
+            return $item;
+        });
+
+        // Si el usuario tiene más de un título
+        if ($data->count() > 1) {
+            $carreras = $data->map(function ($titulo) {
+                return [
+                    'idCarr' => $titulo->idCarr,
+                    'NombCarr' => $titulo->NombCarr
+                ];
+            })->unique('idCarr')->values();
+
+            return response()->json([
+                'multiple' => true,
+                'carreras' => $carreras,
+                'titulos' => $data
+            ]);
+        }
+
+        // Si solo tiene un título
+        $titulo = $data->first();
+
+        return response()->json([
+            'multiple' => false,
+            'titulo' => $titulo
+        ]);
     }
 
     /**
@@ -43,14 +77,11 @@ class RegistroTituloController extends Controller
     public function update(Request $request, string $id)
     {
         //
-       
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-       
-    }
+    public function destroy(string $id) {}
 }
