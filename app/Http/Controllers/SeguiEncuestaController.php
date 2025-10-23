@@ -129,7 +129,7 @@ class SeguiEncuestaController extends Controller
                 'seguipreguntas.ID as id_pregunta',
                 'seguipreguntas.PREGUNTA as texto_pregunta',
                 'seguipreguntas.tipo',
-                'facultad.siglas as facultad',
+                'facultad.facultad',
 
                 'seguidetalleencuesta.idtiporespuesta',
 
@@ -175,7 +175,7 @@ class SeguiEncuestaController extends Controller
                     'seguipreguntas.ID',
                     'seguipreguntas.PREGUNTA',
                     'seguipreguntas.tipo',
-                    'facultad.siglas',
+                    'facultad.facultad',
                     'seguidetalleencuesta.idtiporespuesta',
                     'seguitiporespuesta.TIPORESPUESTA'
                 )

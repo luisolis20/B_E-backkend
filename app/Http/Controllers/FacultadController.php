@@ -11,7 +11,7 @@ class FacultadController extends Controller
      */
     public function index()
     {
-       $data = Facultad::select('facultad.*')->whereNotNull('facultad.siglas')->paginate(20);
+       $data = Facultad::select('facultad.*')->whereNotNull('facultad.facultad')->paginate(20);
         if ($data->isEmpty()) {
             return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
         }
