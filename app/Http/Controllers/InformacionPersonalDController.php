@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\informacionpersonal;
 use App\Models\informacionpersonal_D;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -128,5 +129,101 @@ class InformacionPersonalDController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+    public function estudiantesfoto(Request $request)
+    {
+        try {
+            $perPage = $request->input('per_page', 20);
+            $perPage = min($perPage, 50);
+
+            // Definimos los IDs de carrera a omitir
+            $carrerasAExcluir = ['056', '122', '124'];
+
+            // Define el año a filtrar para la factura
+            $anioFactura = 2025;
+
+            $data = informacionpersonal::select(
+                'informacionpersonal.CIInfPer',
+                'informacionpersonal.NombInfPer',
+                'informacionpersonal.ApellInfPer',
+                'informacionpersonal.ApellMatInfPer',
+                'informacionpersonal.mailPer',
+                'informacionpersonal.fotografia',
+                'carrera.NombCarr'
+            )
+                ->join('ingreso', 'ingreso.CIInfPer', '=', 'informacionpersonal.CIInfPer')
+                ->join('carrera', 'carrera.idCarr', '=', 'ingreso.idcarr')
+
+                // Subconsulta para encontrar la factura más reciente del año 2025 por estudiante
+                ->joinSub(function ($query) use ($anioFactura) {
+                    $query->from('factura')
+                        ->selectRaw('cedula, MAX(fecha) as fecha_factura')
+                        ->whereYear('fecha', $anioFactura) // Filtrar por año 2025
+                        ->groupBy('cedula');
+                }, 'factura_2025', function ($join) {
+                    $join->on('factura_2025.cedula', '=', 'informacionpersonal.CIInfPer');
+                })
+
+                // Omitir las carreras especificadas
+                ->whereNotIn('carrera.idCarr', $carrerasAExcluir)
+
+                // Condiciones para la fotografía (dejamos las que ya tenías)
+                ->whereNotNull('informacionpersonal.fotografia')
+                ->whereRaw('LENGTH(informacionpersonal.fotografia) > 0')
+                // La siguiente línea es redundante con whereRaw, pero la dejo por si tiene una razón específica en tu entorno
+                ->where('LENGTH(informacionpersonal.fotografia) > 0')
+
+                // Agrupar por CI para evitar duplicados de estudiantes, ya que la subconsulta asegura que solo 
+                // se une con una "factura_2025" (la más reciente de ese año) por CI
+                ->groupBy(
+                    'informacionpersonal.CIInfPer',
+                    'informacionpersonal.NombInfPer',
+                    'informacionpersonal.ApellInfPer',
+                    'informacionpersonal.ApellMatInfPer',
+                    'informacionpersonal.mailPer',
+                    'informacionpersonal.fotografia',
+                    'carrera.NombCarr'
+                )
+                ->paginate($perPage);
+
+            if ($data->isEmpty()) {
+                return response()->json(['data' => [], 'message' => 'No se encontraron estudiantes con fotografía bajo los criterios especificados'], 200);
+            }
+
+            $withPhotos = $request->boolean('withPhotos', true);
+
+            $data->getCollection()->transform(function ($item) use ($withPhotos) {
+                $attributes = $item->getAttributes();
+
+                if ($withPhotos && !empty($attributes['fotografia'])) {
+                    $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->buffer($attributes['fotografia']);
+                    $attributes['fotografia'] = [
+                        'mime' => $mimeType,
+                        'data' => base64_encode($attributes['fotografia']),
+                    ];
+                } else {
+                    unset($attributes['fotografia']);
+                    $attributes['hasPhoto'] = true;
+                }
+
+                return $attributes;
+            });
+
+            return response()->json([
+                'data' => $data->items(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ]
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Error interno del servidor: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }
