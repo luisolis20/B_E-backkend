@@ -64,7 +64,10 @@ class ConstOfertasNOPOST extends Controller
             $data = $ofertas->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido
@@ -100,7 +103,7 @@ class ConstOfertasNOPOST extends Controller
                 ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
                 ->where('oferta__empleos_be.estado_ofert', '=', 1)
                 ->whereNotIn('oferta__empleos_be.id', $postulaciones); // Excluir las ofertas en las que el usuario ya ha postulado
-             if ($request->has('all') && $request->all === 'true') {
+            if ($request->has('all') && $request->all === 'true') {
                 $data = $ofertas->get();
                 $data->transform(function ($item) {
                     $attributes = $item->getAttributes();
@@ -120,7 +123,10 @@ class ConstOfertasNOPOST extends Controller
             $data = $ofertas->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido

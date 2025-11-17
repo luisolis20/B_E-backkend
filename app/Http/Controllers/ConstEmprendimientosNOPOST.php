@@ -75,7 +75,10 @@ class ConstEmprendimientosNOPOST extends Controller
         // Si es paginado
         $data = $emprendimientos->paginate(20);
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos'], 404);
+           return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         $data->getCollection()->transform(function ($item) {
