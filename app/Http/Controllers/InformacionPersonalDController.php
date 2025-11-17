@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\informacionpersonal;
 use App\Models\informacionpersonal_D;
+use App\Models\informacionpersonal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class InformacionPersonalDController extends Controller
 {
@@ -68,7 +70,97 @@ class InformacionPersonalDController extends Controller
             ], 500);
         }
     }
+    public function getdocentes(Request $request)
+    {
+        try {
+            // 🔹 Controlar el número de registros por página
+            $perPage = $request->input('per_page', 20);
+            $perPage = min($perPage, 50); // No permitir más de 50 por página
 
+            // 🔹 Consulta optimizada: solo columnas necesarias. ***QUITAMOS 'fotografia'***
+            $data = informacionpersonal_D::select('CIInfPer', 'NombInfPer', 'ApellInfPer', 'ApellMatInfPer', 'mailPer', 'TipoInfPer')
+                ->where('StatusPer', 1)
+                // Filtramos a mano los que tienen foto (usando la subconsulta o un join si es necesario)
+                // Para mantener la lógica de "solo usuarios con foto" pero sin cargar el BLOB:
+                ->whereNotNull('fotografia')
+                ->whereRaw("LENGTH(fotografia) > 0")
+                ->paginate($perPage);
+
+            if ($data->isEmpty()) {
+                return response()->json(['data' => [], 'message' => 'No se encontraron datos con fotografía'], 200);
+            }
+
+            // 🔹 Transformación: Ahora NO HACE NINGÚN CÁLCULO DE FOTO NI BASE64
+            $data->getCollection()->transform(function ($item) {
+                $attributes = $item->getAttributes();
+
+                // Simplemente indicamos que el usuario tiene foto (ya filtrado por la consulta)
+                $attributes['hasPhoto'] = true;
+
+                // Aseguramos que la columna 'fotografia' no sea enviada accidentalmente
+                unset($attributes['fotografia']);
+
+                return $attributes;
+            });
+
+            return response()->json([
+                'data' => $data->items(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ]
+            ], 200);
+        } catch (\Throwable $e) {
+            // Log::error('Error en index DController: ' . $e->getMessage()); // Opcional
+            return response()->json([
+                'error' => true,
+                'message' => 'Error interno del servidor: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function getFotografia($ci)
+    {
+        try {
+            // 1. Obtener SÓLO la columna 'fotografia' para el CI específico
+            $persona = informacionpersonal_D::where('CIInfPer', $ci)
+                ->select('fotografia')
+                ->first();
+
+            // 2. Verificar si el usuario existe y si tiene foto
+            if (!$persona || empty($persona->fotografia)) {
+                // Devolver una respuesta HTTP 404 (Not Found)
+                return response()->json(['error' => 'Fotografía no encontrada para el CI: ' . $ci], 404);
+            }
+
+            $fotoBinaria = $persona->fotografia;
+
+            // 3. Determinar el MIME type
+            $mime = 'image/jpeg'; // MIME type por defecto
+
+            // Intenta determinar el MIME type si el ambiente lo permite
+            if (extension_loaded('fileinfo')) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $detectedMime = finfo_buffer($finfo, $fotoBinaria);
+                finfo_close($finfo);
+
+                if ($detectedMime && strpos($detectedMime, 'image') === 0) {
+                    $mime = $detectedMime;
+                }
+            }
+
+            // 4. Devolver la imagen como una respuesta binaria (STREAM)
+            return Response::make($fotoBinaria, 200)
+                ->header('Content-Type', $mime)
+                ->header('Content-Disposition', 'inline; filename="foto_' . $ci . '"');
+        } catch (\Throwable $e) {
+            // Log::error('Error en getFotografia DController: ' . $e->getMessage()); // Opcional
+            return response()->json(['error' => 'Error al obtener la fotografía: ' . $e->getMessage()], 500);
+        }
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -136,13 +228,9 @@ class InformacionPersonalDController extends Controller
             $perPage = $request->input('per_page', 20);
             $perPage = min($perPage, 50);
 
-            // Definimos los IDs de carrera a omitir
-            $carrerasAExcluir = ['056', '122', '124'];
+            $carrerasAExcluir = ['056', '122', '124', '197', '206', '601', '602', '603'];
 
-            // Define el año a filtrar para la factura
-            $anioFactura = 2025;
-
-            $data = informacionpersonal::select(
+            $query = informacionpersonal::select(
                 'informacionpersonal.CIInfPer',
                 'informacionpersonal.NombInfPer',
                 'informacionpersonal.ApellInfPer',
@@ -151,30 +239,36 @@ class InformacionPersonalDController extends Controller
                 'informacionpersonal.fotografia',
                 'carrera.NombCarr'
             )
+
+                // INNER JOIN factura
+                ->join('factura', 'factura.cedula', '=', 'informacionpersonal.CIInfPer')
+
+                // INNER JOIN ingreso
                 ->join('ingreso', 'ingreso.CIInfPer', '=', 'informacionpersonal.CIInfPer')
+
+                // INNER JOIN carrera
                 ->join('carrera', 'carrera.idCarr', '=', 'ingreso.idcarr')
 
-                // Subconsulta para encontrar la factura más reciente del año 2025 por estudiante
-                ->joinSub(function ($query) use ($anioFactura) {
-                    $query->from('factura')
-                        ->selectRaw('cedula, MAX(fecha) as fecha_factura')
-                        ->whereYear('fecha', $anioFactura) // Filtrar por año 2025
-                        ->groupBy('cedula');
-                }, 'factura_2025', function ($join) {
-                    $join->on('factura_2025.cedula', '=', 'informacionpersonal.CIInfPer');
+                // IDPER más reciente para ese estudiante
+                ->whereIn('ingreso.idper', function ($sub) use ($carrerasAExcluir) {
+                    $sub->from('ingreso as i2')
+                        ->selectRaw('MAX(i2.idper)')
+                        ->join('carrera as c2', 'c2.idCarr', '=', 'i2.idcarr')
+                        ->whereColumn('i2.CIInfPer', 'ingreso.CIInfPer')
+                        ->whereNotIn('c2.idCarr', $carrerasAExcluir)
+                        ->where('c2.NombCarr', 'NOT LIKE', '%TRABAJO DE INTEGRACIÓN CURRICULAR%')
+                        ->groupBy('i2.CIInfPer');
                 })
 
-                // Omitir las carreras especificadas
+                // Filtros de carrera
                 ->whereNotIn('carrera.idCarr', $carrerasAExcluir)
+                ->where('carrera.NombCarr', 'NOT LIKE', '%TRABAJO DE INTEGRACIÓN CURRICULAR%')
 
-                // Condiciones para la fotografía (dejamos las que ya tenías)
+                // Foto no nula y con contenido
                 ->whereNotNull('informacionpersonal.fotografia')
                 ->whereRaw('LENGTH(informacionpersonal.fotografia) > 0')
-                // La siguiente línea es redundante con whereRaw, pero la dejo por si tiene una razón específica en tu entorno
-                ->where('LENGTH(informacionpersonal.fotografia) > 0')
 
-                // Agrupar por CI para evitar duplicados de estudiantes, ya que la subconsulta asegura que solo 
-                // se une con una "factura_2025" (la más reciente de ese año) por CI
+                // Agrupar tal como en el SQL
                 ->groupBy(
                     'informacionpersonal.CIInfPer',
                     'informacionpersonal.NombInfPer',
@@ -183,8 +277,11 @@ class InformacionPersonalDController extends Controller
                     'informacionpersonal.mailPer',
                     'informacionpersonal.fotografia',
                     'carrera.NombCarr'
-                )
-                ->paginate($perPage);
+                );
+
+            $data = $query->paginate($perPage);
+
+            // ... (El resto del código de transformación y retorno)
 
             if ($data->isEmpty()) {
                 return response()->json(['data' => [], 'message' => 'No se encontraron estudiantes con fotografía bajo los criterios especificados'], 200);
@@ -206,7 +303,6 @@ class InformacionPersonalDController extends Controller
                     unset($attributes['fotografia']);
                     $attributes['hasPhoto'] = true;
                 }
-
                 return $attributes;
             });
 
