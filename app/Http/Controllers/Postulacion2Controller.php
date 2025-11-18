@@ -13,6 +13,13 @@ class Postulacion2Controller extends Controller
     public function index(Request $request)
     {
         try {
+            $userId = $request->query('user_id');
+
+            // Verifica si el user_id está presente
+            if (!$userId) {
+                // Manejar la falta de user_id, por ejemplo, retornar un error 400 o un array vacío
+                return response()->json(['error' => 'user_id es requerido'], 400);
+            }
 
             $query = Postulacion::select(
                 'postulacions_be.id',
@@ -35,7 +42,7 @@ class Postulacion2Controller extends Controller
                 ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
                 ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
                 ->leftJoin('estado_postulaciones_be', 'estado_postulaciones_be.postulacion_id', '=', 'postulacions_be.id')
-                ->where('be_users.id', $request->user_id); // usuario dueño de la empresa
+                ->where('be_users.id', $userId); // usuario dueño de la empresa
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
 

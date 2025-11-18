@@ -15,7 +15,7 @@ class ConstEstadoPOST2Controller extends Controller
         try {
 
             $query = EstadoPostulacion::select(
-                'estado_postulaciones_be.id',
+                'estado_postulaciones_be.id as estado_id',
                 'estado_postulaciones_be.postulacion_id',
                 'estado_postulaciones_be.estado',
                 'estado_postulaciones_be.fecha',
@@ -109,7 +109,7 @@ class ConstEstadoPOST2Controller extends Controller
     public function show(string $id)
     {
         $data = EstadoPostulacion::select(
-            'estado_postulaciones_be.id',
+            'estado_postulaciones_be.id as estado_id',
             'estado_postulaciones_be.postulacion_id',
             'estado_postulaciones_be.estado',
             'estado_postulaciones_be.fecha',
