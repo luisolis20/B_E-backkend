@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Facultad;
 use Illuminate\Http\Request;
 
@@ -11,9 +12,12 @@ class FacultadController extends Controller
      */
     public function index()
     {
-       $data = Facultad::select('facultad.*')->whereNotNull('facultad.facultad')->paginate(20);
+        $data = Facultad::select('facultad.*')->whereNotNull('facultad.facultad')->paginate(20);
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página
@@ -40,27 +44,27 @@ class FacultadController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
-        
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        
-    }
+    public function store(Request $request) {}
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-         $data = Facultad::select(
-            'facultad.*')
+        $data = Facultad::select(
+            'facultad.*'
+        )
             ->paginate(20);
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página
@@ -95,14 +99,11 @@ class FacultadController extends Controller
     public function update(Request $request, string $id)
     {
         //
-       
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-       
-    }
+    public function destroy(string $id) {}
 }

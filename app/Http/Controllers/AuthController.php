@@ -110,7 +110,7 @@ class AuthController extends Controller
                 'mensaje' => 'Autenticación exitosa',
                 'token' => $token,
                 'token_type' => 'bearer',
-                //'expires_in' => auth()->factory()->getTTL() * 60,
+                'expires_in' => config('jwt.ttl') * 60,
                 'name' => $user->name,
                 'email' => $user->email,
                 'id' => $user->id,
@@ -131,7 +131,7 @@ class AuthController extends Controller
         return response()->json(auth()->user());
     }
     public function logout(){
-        auth()->logout();
+        //auth()->logout();
         try{
             $token = JWTAuth::getToken();
             if(!$token){
@@ -151,7 +151,7 @@ class AuthController extends Controller
             if(!$token){
                 return response()->json(['error'=>'No hay token'],Response::HTTP_BAD_REQUEST);
             }
-            $nuevo_token = auth()->refresh();
+            $nuevo_token = JWTAuth::refresh();
             JWTAuth::invalidate($token);
             return $this->respondWithToken($nuevo_token);
         }catch(TokenInvalidException $e){
@@ -164,7 +164,7 @@ class AuthController extends Controller
         return response()->json([
             'token'=>$token,
             'token_type' => 'bearer',
-            //'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
         ],Response::HTTP_OK);
     }
 }

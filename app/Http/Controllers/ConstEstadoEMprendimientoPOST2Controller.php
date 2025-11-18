@@ -12,9 +12,9 @@ class ConstEstadoEMprendimientoPOST2Controller extends Controller
      */
     public function index(Request $request)
     {
-        try{
+        try {
 
-            $query= EstadoPostulacionEmprendimiento::select(
+            $query = EstadoPostulacionEmprendimiento::select(
                 'be_estado_postulaciones_emprendimientos.id',
                 'be_estado_postulaciones_emprendimientos.interaccion_id',
                 'be_estado_postulaciones_emprendimientos.estado',
@@ -33,9 +33,9 @@ class ConstEstadoEMprendimientoPOST2Controller extends Controller
                 'informacionpersonal.DirecDomicilioPer',
                 'be_estado_postulaciones_emprendimientos.created_at'
             )
-            ->join('be_interacciones_emprendimientos', 'be_interacciones_emprendimientos.id', '=', 'be_estado_postulaciones_emprendimientos.interaccion_id')
-            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
-            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer');
+                ->join('be_interacciones_emprendimientos', 'be_interacciones_emprendimientos.id', '=', 'be_estado_postulaciones_emprendimientos.interaccion_id')
+                ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
+                ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer');
             // Verificar si se solicita todos los datos sin paginación
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
@@ -58,7 +58,10 @@ class ConstEstadoEMprendimientoPOST2Controller extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido
@@ -80,11 +83,9 @@ class ConstEstadoEMprendimientoPOST2Controller extends Controller
                 'total' => $data->total(),
                 'last_page' => $data->lastPage(),
             ]);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
-    
-       
     }
 
     /**
@@ -95,8 +96,8 @@ class ConstEstadoEMprendimientoPOST2Controller extends Controller
         $inputs = $request->input();
         $res = EstadoPostulacionEmprendimiento::create($inputs);
         return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Postulación Aceptada",
+            'data' => $res,
+            'mensaje' => "Postulación Aceptada",
         ]);
     }
 
@@ -123,14 +124,17 @@ class ConstEstadoEMprendimientoPOST2Controller extends Controller
             'informacionpersonal.DirecDomicilioPer',
             'be_estado_postulaciones_emprendimientos.created_at'
         )
-        ->join('be_interacciones_emprendimientos', 'be_interacciones_emprendimientos.id', '=', 'be_estado_postulaciones_emprendimientos.interaccion_id')
-        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer')
-        ->where('be_interacciones_emprendimientos.id', $id)
-        ->paginate(20);
+            ->join('be_interacciones_emprendimientos', 'be_interacciones_emprendimientos.id', '=', 'be_estado_postulaciones_emprendimientos.interaccion_id')
+            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer')
+            ->where('be_interacciones_emprendimientos.id', $id)
+            ->paginate(20);
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página

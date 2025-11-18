@@ -43,7 +43,10 @@ class SeguiEncuestaController extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             $data->getCollection()->transform(function ($item) {
@@ -94,7 +97,10 @@ class SeguiEncuestaController extends Controller
             ->paginate(20);
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página
@@ -183,7 +189,10 @@ class SeguiEncuestaController extends Controller
                 ->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Forzar codificación UTF-8 para evitar caracteres raros
@@ -229,7 +238,10 @@ class SeguiEncuestaController extends Controller
                 ->get();
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron respuestas abiertas para esta pregunta'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             $data->transform(function ($item) {

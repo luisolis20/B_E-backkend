@@ -39,17 +39,20 @@ class ConstPostuController extends Controller
             'informacionpersonal.NombInfPer',
             'informacionpersonal.mailPer',
             'informacionpersonal.CelularInfPer',
-            'informacionpersonal.DirecDomicilioPer', 
+            'informacionpersonal.DirecDomicilioPer',
             'postulacions_be.created_at'
         )
-        ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
-        ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
-        ->where('postulacions_be.id', $id)
-       ->paginate(20);
+            ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
+            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
+            ->where('postulacions_be.id', $id)
+            ->paginate(20);
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página

@@ -38,7 +38,10 @@ class ConstOfertEmprenidimientos2Controller extends Controller
                 ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
                 ->paginate(20);
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los campos a UTF-8 válido para cada página
@@ -117,7 +120,10 @@ class ConstOfertEmprenidimientos2Controller extends Controller
                 ->where('be_oferta_empleos_empre.id', $id)
                 ->paginate(20);
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los campos a UTF-8 válido para cada página

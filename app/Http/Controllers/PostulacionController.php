@@ -55,7 +55,10 @@ class PostulacionController extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido
@@ -123,7 +126,10 @@ class PostulacionController extends Controller
             ->where('oferta__empleos_be.id', $id)
             ->paginate(20);
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página

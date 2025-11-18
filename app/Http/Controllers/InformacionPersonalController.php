@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\informacionpersonal;
 use App\Models\User;
 use App\Models\InformacionPersonald;
@@ -40,7 +41,10 @@ class InformacionPersonalController extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido
@@ -65,7 +69,7 @@ class InformacionPersonalController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
-    } 
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -73,13 +77,13 @@ class InformacionPersonalController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-       
-        
-        $inputs["codigo_dactilar"] = md5(trim($request->codigo_dactilar)); 
+
+
+        $inputs["codigo_dactilar"] = md5(trim($request->codigo_dactilar));
         $res = informacionpersonal::create($inputs);
         return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Agregado con Éxito!!",
+            'data' => $res,
+            'mensaje' => "Agregado con Éxito!!",
         ]);
     }
 
@@ -88,15 +92,18 @@ class InformacionPersonalController extends Controller
      */
     public function show(string $id)
     {
-       // Aplica paginación al resultado del filtro
-       $data = informacionpersonal::select('informacionpersonal.*')
-       ->where('informacionpersonal.CIInfPer', $id)
-       ->paginate(20);
-       if ($data->isEmpty()) {
-           return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
-       }
+        // Aplica paginación al resultado del filtro
+        $data = informacionpersonal::select('informacionpersonal.*')
+            ->where('informacionpersonal.CIInfPer', $id)
+            ->paginate(20);
+        if ($data->isEmpty()) {
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
+        }
 
-       // Convertir los campos a UTF-8 válido para cada página
+        // Convertir los campos a UTF-8 válido para cada página
         $data->getCollection()->transform(function ($item) {
             $attributes = $item->getAttributes();
 
@@ -112,18 +119,18 @@ class InformacionPersonalController extends Controller
             return $attributes;
         });
 
-       // Retornar la respuesta JSON con los metadatos de paginación
-       try {
-           return response()->json([
-               'data' => $data->items(),
-               'current_page' => $data->currentPage(),
-               'per_page' => $data->perPage(),
-               'total' => $data->total(),
-               'last_page' => $data->lastPage(),
-           ]);
-       } catch (\Exception $e) {
-           return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
-       }
+        // Retornar la respuesta JSON con los metadatos de paginación
+        try {
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -131,40 +138,8 @@ class InformacionPersonalController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = informacionpersonal::find($id);
-        if(isset($res)){
-            $res->CIInfPer = $request->CIInfPer;
-            $res->ApellInfPer = $request->ApellInfPer;
-            $res->ApellMatInfPer = $request->ApellMatInfPer;
-            $res->NombInfPer = $request->NombInfPer;
-            $res->NacionalidadPer = $request->NacionalidadPer;
-            $res->LugarNacimientoPer = $request->LugarNacimientoPer;
-            $res->FechNacimPer = $request->FechNacimPer;
-            $res->GeneroPer = $request->GeneroPer;
-            $res->CiudadPer = $request->CiudadPer;
-            $res->DirecDomicilioPer = $request->DirecDomicilioPer;
-            $res->Telf1InfPer = $request->Telf1InfPer;
-            $res->mailPer = $request->mailPer;
-            $res->fotografia = $request->fotografia;
-           
-            if($res->save()){
-                return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Actualizado con Éxito!!",
-                ]);
-            }
-            else{
-                return response()->json([
-                    'error'=>true,
-                    'mensaje'=>"Error al Actualizar",
-                ]);
-            }
-        }else{
-            return response()->json([
-                'error'=>true,
-                'mensaje'=>" $id no Existe",
-            ]);
-        }
+        
+        
     }
 
     /**
@@ -179,7 +154,7 @@ class InformacionPersonalController extends Controller
         $CIInfPer = $request->input('CIInfPer');
         $codigo_dactilar = $request->input('codigo_dactilar');
 
-        
+
         $res = informacionpersonal::select('CIInfPer', 'codigo_dactilar', 'ApellInfPer', 'mailPer')
             ->where('CIInfPer', $CIInfPer)
             ->first();
@@ -193,7 +168,7 @@ class InformacionPersonalController extends Controller
             ->first();
 
         if ($res) {
-            if($res2){
+            if ($res2) {
                 if (md5($codigo_dactilar) !== $res->codigo_dactilar) {
                     return response()->json([
                         'error' => true,
@@ -209,7 +184,7 @@ class InformacionPersonalController extends Controller
                     'ApellInfPer' => $res->ApellInfPer,
                     'mailPer' => $res->mailPer,
                 ]);
-            }else{
+            } else {
                 return response()->json([
                     'mensaje' => 'El usuario estudiante aun no se ha graduado',
                     'Rol' => 'Estudiante',
@@ -219,7 +194,6 @@ class InformacionPersonalController extends Controller
                     'mailPer' => $res->mailPer,
                 ]);
             }
-            
         } elseif ($user) {
             if ($user->estado !== 1) {
                 return response()->json([
@@ -251,5 +225,4 @@ class InformacionPersonalController extends Controller
             ]);
         }
     }
-
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Carrera;
 use Illuminate\Http\Request;
 
@@ -11,24 +12,18 @@ class CarreraController extends Controller
      */
     public function index()
     {
-       /// return response()->json(Carrera::all());
+        /// return response()->json(Carrera::all());
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        
-    }
+    public function store(Request $request) {}
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-    
-    }
+    public function show(string $id) {}
 
     /**
      * Update the specified resource in storage.
@@ -36,17 +31,14 @@ class CarreraController extends Controller
     public function update(Request $request, string $id)
     {
         //
-       
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-       
-    }
-     public function carrerasPorFacultad($idfacultad)
+    public function destroy(string $id) {}
+    public function carrerasPorFacultad($idfacultad)
     {
         try {
             // Traer las carreras con StatusCarr = 1
@@ -57,9 +49,9 @@ class CarreraController extends Controller
             // Si no hay resultados
             if ($carreras->isEmpty()) {
                 return response()->json([
-                    'message' => 'No se encontraron carreras habilitadas para esta facultad.',
-                    'data' => []
-                ], 404);
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Respuesta exitosa
@@ -67,7 +59,6 @@ class CarreraController extends Controller
                 'message' => 'Carreras habilitadas encontradas correctamente.',
                 'data' => $carreras
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al obtener las carreras.',

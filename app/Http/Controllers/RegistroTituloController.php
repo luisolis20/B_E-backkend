@@ -34,7 +34,10 @@ class RegistroTituloController extends Controller
             ->get();
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron interacciones para este emprendimiento'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         $data->transform(function ($item) {
@@ -81,7 +84,10 @@ class RegistroTituloController extends Controller
             ->get();
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron interacciones para este emprendimiento'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         $data->transform(function ($item) {

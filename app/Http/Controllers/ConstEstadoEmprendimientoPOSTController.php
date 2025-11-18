@@ -11,10 +11,10 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    { 
-        try{
+    {
+        try {
 
-            $query= EstadoPostulacionEmprendimiento::select('be_estado_postulaciones_emprend.*');
+            $query = EstadoPostulacionEmprendimiento::select('be_estado_postulaciones_emprend.*');
             // Verificar si se solicita todos los datos sin paginación
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
@@ -37,7 +37,10 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido
@@ -59,11 +62,9 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
                 'total' => $data->total(),
                 'last_page' => $data->lastPage(),
             ]);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
-    
-       
     }
 
     /**
@@ -74,8 +75,8 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
         $inputs = $request->input();
         $res = EstadoPostulacionEmprendimiento::create($inputs);
         return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Postulación Aceptada",
+            'data' => $res,
+            'mensaje' => "Postulación Aceptada",
         ]);
     }
 
@@ -103,15 +104,18 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
             'be_oferta_empleos_empre.id as IDOferta',
             'be_estado_postulaciones_emprend.created_at'
         )
-        ->join('be_postulacions_empren', 'be_postulacions_empren.id', '=', 'be_estado_postulaciones_emprend.postulacion_empren_id')
-        ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
-        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
-        ->where('informacionpersonal.CIInfPer', $id)
-        ->paginate(20);
+            ->join('be_postulacions_empren', 'be_postulacions_empren.id', '=', 'be_estado_postulaciones_emprend.postulacion_empren_id')
+            ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
+            ->where('informacionpersonal.CIInfPer', $id)
+            ->paginate(20);
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página
@@ -144,12 +148,12 @@ class ConstEstadoEmprendimientoPOSTController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        
+
         $inputs = $request->input();
         $res = EstadoPostulacionEmprendimiento::where("id", $id)->update($inputs);
         return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Postulación Actualizada",
+            'data' => $res,
+            'mensaje' => "Postulación Actualizada",
         ]);
     }
 

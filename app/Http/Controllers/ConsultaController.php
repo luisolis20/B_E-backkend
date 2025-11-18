@@ -1,17 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Empresa;
 use Illuminate\Http\Request;
 
 class ConsultaController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-       try {
+        try {
 
             $query = Empresa::select('praempresa.*');
             if ($request->has('all') && $request->all === 'true') {
@@ -35,7 +36,10 @@ class ConsultaController extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido
@@ -78,7 +82,7 @@ class ConsultaController extends Controller
      */
     public function show(string $id)
     {
-         $res = Empresa::find($id);
+        $res = Empresa::find($id);
         if (isset($res)) {
             // Verificar si la imagen existe y codificarla en base64
             $res->imagen = $res->imagen ? base64_encode($res->imagen) : null;
@@ -100,8 +104,8 @@ class ConsultaController extends Controller
     public function update(Request $request, string $id)
     {
         $res = Empresa::find($id);
-        if(isset($res)){
-             $res->ruc = $request->ruc;
+        if (isset($res)) {
+            $res->ruc = $request->ruc;
             $res->empresa = $request->empresa;
             $res->empresacorta = $request->empresacorta;
             $res->pais = $request->pais;
@@ -140,10 +144,10 @@ class ConsultaController extends Controller
                     'mensaje' => "Error al Actualizar",
                 ]);
             }
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"La Empresa con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "La Empresa con id: $id no Existe",
             ]);
         }
     }

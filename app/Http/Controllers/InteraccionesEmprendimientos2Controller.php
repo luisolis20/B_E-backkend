@@ -51,7 +51,10 @@ class InteraccionesEmprendimientos2Controller extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron interacciones'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             $data->getCollection()->transform(function ($item) {
@@ -116,7 +119,10 @@ class InteraccionesEmprendimientos2Controller extends Controller
             ->paginate(20);
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron interacciones para este emprendimiento'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         $data->getCollection()->transform(function ($item) {

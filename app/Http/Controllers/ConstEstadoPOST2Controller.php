@@ -12,32 +12,32 @@ class ConstEstadoPOST2Controller extends Controller
      */
     public function index(Request $request)
     {
-        try{
+        try {
 
-            $query= EstadoPostulacion::select(
-            'estado_postulaciones_be.id',
-            'estado_postulaciones_be.postulacion_id',
-            'estado_postulaciones_be.estado',
-            'estado_postulaciones_be.fecha',
-            'estado_postulaciones_be.detalle_estado',
-            'postulacions_be.id as IDPostulacion',
-            'praempresa.idempresa as IDEmpresa',
-            'praempresa.empresacorta as Empresa',
-            'informacionpersonal.CIInfPer',
-            'informacionpersonal.ApellInfPer',
-            'informacionpersonal.ApellMatInfPer',
-            'informacionpersonal.NombInfPer',
-            'informacionpersonal.mailPer',
-            'informacionpersonal.CelularInfPer',
-            'informacionpersonal.DirecDomicilioPer',
-            'oferta__empleos_be.titulo as Oferta',
-            'oferta__empleos_be.id as IDOferta',
-            'estado_postulaciones_be.created_at'
-        )
-        ->join('postulacions_be', 'postulacions_be.id', '=', 'estado_postulaciones_be.postulacion_id')
-        ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
-        ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer');
+            $query = EstadoPostulacion::select(
+                'estado_postulaciones_be.id',
+                'estado_postulaciones_be.postulacion_id',
+                'estado_postulaciones_be.estado',
+                'estado_postulaciones_be.fecha',
+                'estado_postulaciones_be.detalle_estado',
+                'postulacions_be.id as IDPostulacion',
+                'praempresa.idempresa as IDEmpresa',
+                'praempresa.empresacorta as Empresa',
+                'informacionpersonal.CIInfPer',
+                'informacionpersonal.ApellInfPer',
+                'informacionpersonal.ApellMatInfPer',
+                'informacionpersonal.NombInfPer',
+                'informacionpersonal.mailPer',
+                'informacionpersonal.CelularInfPer',
+                'informacionpersonal.DirecDomicilioPer',
+                'oferta__empleos_be.titulo as Oferta',
+                'oferta__empleos_be.id as IDOferta',
+                'estado_postulaciones_be.created_at'
+            )
+                ->join('postulacions_be', 'postulacions_be.id', '=', 'estado_postulaciones_be.postulacion_id')
+                ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
+                ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+                ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer');
             // Verificar si se solicita todos los datos sin paginación
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
@@ -60,7 +60,10 @@ class ConstEstadoPOST2Controller extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido
@@ -82,11 +85,9 @@ class ConstEstadoPOST2Controller extends Controller
                 'total' => $data->total(),
                 'last_page' => $data->lastPage(),
             ]);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
-    
-       
     }
 
     /**
@@ -97,8 +98,8 @@ class ConstEstadoPOST2Controller extends Controller
         $inputs = $request->input();
         $res = EstadoPostulacion::create($inputs);
         return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Postulación Aceptada",
+            'data' => $res,
+            'mensaje' => "Postulación Aceptada",
         ]);
     }
 
@@ -127,15 +128,18 @@ class ConstEstadoPOST2Controller extends Controller
             'oferta__empleos_be.id as IDOferta',
             'estado_postulaciones_be.created_at'
         )
-        ->join('postulacions_be', 'postulacions_be.id', '=', 'estado_postulaciones_be.postulacion_id')
-        ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
-        ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
-        ->where('postulacions_be.id', $id)
-        ->paginate(20);
+            ->join('postulacions_be', 'postulacions_be.id', '=', 'estado_postulaciones_be.postulacion_id')
+            ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
+            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
+            ->where('postulacions_be.id', $id)
+            ->paginate(20);
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página

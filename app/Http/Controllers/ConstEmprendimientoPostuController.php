@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InteraccionesEmprendimiento;
+use App\Models\PostulacionesEmprendimiento;
 use Illuminate\Http\Request;
 
 class ConstEmprendimientoPostuController extends Controller
@@ -28,10 +28,11 @@ class ConstEmprendimientoPostuController extends Controller
      */
     public function show(string $id)
     {
-        $data = InteraccionesEmprendimiento::select(
-            'be_interacciones_emprendimientos.id',
+        $data = PostulacionesEmprendimiento::select(
+            'be_postulacions_empren.id',
             'be_emprendimientos.nombre_emprendimiento as Emprendimiento',
-            'be_emprendimientos.descripcion as Descripcion',
+            'be_oferta_empleos_empre.titulo as Oferta',
+            'be_oferta_empleos_empre.descripcion',
             'informacionpersonal.CIInfPer',
             'informacionpersonal.ApellInfPer',
             'informacionpersonal.ApellMatInfPer',
@@ -39,15 +40,19 @@ class ConstEmprendimientoPostuController extends Controller
             'informacionpersonal.mailPer',
             'informacionpersonal.CelularInfPer',
             'informacionpersonal.DirecDomicilioPer',
-            'be_interacciones_emprendimientos.created_at'
+            'be_postulacions_empren.created_at'
         )
-        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_interacciones_emprendimientos.emprendimiento_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_interacciones_emprendimientos.CIInfPer')
-        ->where('be_interacciones_emprendimientos.id', $id)
-       ->paginate(20);
+            ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
+            ->where('be_postulacions_empren.id', $id)
+            ->paginate(20);
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página

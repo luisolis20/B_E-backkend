@@ -1,17 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Postulacion;
 use Illuminate\Http\Request;
 
 class Postulacion2Controller extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        try{
+        try {
 
             $query = Postulacion::select(
                 'postulacions_be.id',
@@ -29,15 +30,15 @@ class Postulacion2Controller extends Controller
                 'estado_postulaciones_be.fecha',
                 'postulacions_be.created_at'
             )
-            ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
-            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
-            ->join('be_users','be_users.id','=','praempresa.usuario_id')
-            ->leftJoin('estado_postulaciones_be', 'estado_postulaciones_be.postulacion_id', '=', 'postulacions_be.id')
-            ->where('be_users.id', $request->user_id); // usuario dueño de la empresa
+                ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
+                ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+                ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
+                ->join('be_users', 'be_users.id', '=', 'praempresa.usuario_id')
+                ->leftJoin('estado_postulaciones_be', 'estado_postulaciones_be.postulacion_id', '=', 'postulacions_be.id')
+                ->where('be_users.id', $request->user_id); // usuario dueño de la empresa
             if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
-    
+
                 // Convertir los datos a UTF-8 válido
                 $data->transform(function ($item) {
                     $attributes = $item->getAttributes();
@@ -48,17 +49,20 @@ class Postulacion2Controller extends Controller
                     }
                     return $attributes;
                 });
-    
+
                 return response()->json(['data' => $data]);
             }
-    
+
             // Paginación por defecto
             $data = $query->paginate(20);
-    
+
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
-    
+
             // Convertir los datos de cada página a UTF-8 válido
             $data->getCollection()->transform(function ($item) {
                 $attributes = $item->getAttributes();
@@ -69,7 +73,7 @@ class Postulacion2Controller extends Controller
                 }
                 return $attributes;
             });
-    
+
             // Retornar respuesta JSON con metadatos de paginación
             return response()->json([
                 'data' => $data->items(),
@@ -78,7 +82,7 @@ class Postulacion2Controller extends Controller
                 'total' => $data->total(),
                 'last_page' => $data->lastPage(),
             ]);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
@@ -91,8 +95,8 @@ class Postulacion2Controller extends Controller
         $inputs = $request->input();
         $res = Postulacion::create($inputs);
         return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Agregado con Éxito!!",
+            'data' => $res,
+            'mensaje' => "Agregado con Éxito!!",
         ]);
     }
 
@@ -113,13 +117,16 @@ class Postulacion2Controller extends Controller
             'informacionpersonal.mailPer',
             'postulacions_be.created_at'
         )
-        ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
-        ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
-        ->where('oferta__empleos_be.id', $id)
-        ->paginate(20);
+            ->join('oferta__empleos_be', 'oferta__empleos_be.id', '=', 'postulacions_be.oferta_id')
+            ->join('praempresa', 'praempresa.idempresa', '=', 'oferta__empleos_be.empresa_id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'postulacions_be.CIInfPer')
+            ->where('oferta__empleos_be.id', $id)
+            ->paginate(20);
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         // Convertir los campos a UTF-8 válido para cada página
@@ -153,27 +160,26 @@ class Postulacion2Controller extends Controller
     public function update(Request $request, string $id)
     {
         //
-       
+
         $res = Postulacion::find($id);
-        if(isset($res)){
+        if (isset($res)) {
             $res->CIInfPer = $request->CIInfPer;
             $res->oferta_id = $request->oferta_id;
-            if($res->save()){
+            if ($res->save()) {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Actualizado con Éxito!!",
+                    'data' => $res,
+                    'mensaje' => "Actualizado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "Error al Actualizar",
                 ]);
             }
-            else{
-                return response()->json([
-                    'error'=>true,
-                    'mensaje'=>"Error al Actualizar",
-                ]);
-            }
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"La Postulación de Empleo con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "La Postulación de Empleo con id: $id no Existe",
             ]);
         }
     }
@@ -184,26 +190,23 @@ class Postulacion2Controller extends Controller
     public function destroy(string $id)
     {
         $res = Postulacion::find($id);
-        if(isset($res)){
+        if (isset($res)) {
             $elim = Postulacion::destroy($id);
-            if($elim){
+            if ($elim) {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Eliminado con Éxito!!",
+                    'data' => $res,
+                    'mensaje' => "Eliminado con Éxito!!",
                 ]);
-            }else{
+            } else {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"La Oferta_Empleo no existe (puede que ya la haya eliminado)",
+                    'data' => $res,
+                    'mensaje' => "La Oferta_Empleo no existe (puede que ya la haya eliminado)",
                 ]);
             }
-           
-           
-           
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"La Oferta_Empleo con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "La Oferta_Empleo con id: $id no Existe",
             ]);
         }
     }

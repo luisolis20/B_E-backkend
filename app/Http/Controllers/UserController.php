@@ -13,10 +13,10 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        try{
-            
-           $query = User::select('be_users.*');
-           if ($request->has('all') && $request->all === 'true') {
+        try {
+
+            $query = User::select('be_users.*');
+            if ($request->has('all') && $request->all === 'true') {
                 $data = $query->get();
 
                 // Convertir los datos a UTF-8 válido
@@ -37,7 +37,10 @@ class UserController extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron datos'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             // Convertir los datos de cada página a UTF-8 válido
@@ -59,8 +62,7 @@ class UserController extends Controller
                 'total' => $data->total(),
                 'last_page' => $data->lastPage(),
             ]);
-
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
@@ -71,11 +73,11 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        $inputs["password"] = md5($request->password); 
+        $inputs["password"] = md5($request->password);
         $res = User::create($inputs);
         return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Agregado con Éxito!!",
+            'data' => $res,
+            'mensaje' => "Agregado con Éxito!!",
         ]);
     }
 
@@ -87,8 +89,8 @@ class UserController extends Controller
         $res = User::find($id);
         if (isset($res)) {
             // Verificar si la imagen existe y codificarla en base64
-           // $res->imagen = $res->imagen ? base64_encode($res->imagen) : null;
-    
+            // $res->imagen = $res->imagen ? base64_encode($res->imagen) : null;
+
             return response()->json([
                 'data' => $res,
                 'mensaje' => "Encontrado con Éxito!!",
@@ -107,28 +109,27 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         $res = User::find($id);
-        if(isset($res)){
+        if (isset($res)) {
             $res->name = $request->name;
             $res->email = $request->email;
             $res->password = md5($request->password);
             $res->role = $request->role;
             $res->estado = $request->estado;
-            if($res->save()){
+            if ($res->save()) {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Actualizado con Éxito!!",
+                    'data' => $res,
+                    'mensaje' => "Actualizado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "Error al Actualizar",
                 ]);
             }
-            else{
-                return response()->json([
-                    'error'=>true,
-                    'mensaje'=>"Error al Actualizar",
-                ]);
-            }
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"El Usuario con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "El Usuario con id: $id no Existe",
             ]);
         }
     }
@@ -139,58 +140,52 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $res = User::find($id);
-        if(isset($res)){
-             $res->estado = 0;
+        if (isset($res)) {
+            $res->estado = 0;
             $res->save();
             $data = $res->toArray();
-            if($data){
-           
+            if ($data) {
+
                 return response()->json([
-                    'data'=>$data,
-                    'mensaje'=>"Inhabilitado con Éxito!!",
+                    'data' => $data,
+                    'mensaje' => "Inhabilitado con Éxito!!",
                 ]);
-            }else{
+            } else {
                 return response()->json([
-                    'data'=>$data,
-                    'mensaje'=>"El usuario no existe (puede que ya la haya eliminado)",
+                    'data' => $data,
+                    'mensaje' => "El usuario no existe (puede que ya la haya eliminado)",
                 ]);
             }
-           
-           
-           
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"El usuario con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "El usuario con id: $id no Existe",
             ]);
         }
     }
     public function habilitar(string $id)
     {
         $res = User::find($id);
-        if(isset($res)){
-             $res->estado = 1;
+        if (isset($res)) {
+            $res->estado = 1;
             $res->save();
             $data = $res->toArray();
-            if($data){
-           
+            if ($data) {
+
                 return response()->json([
-                    'data'=>$data,
-                    'mensaje'=>"Eliminado con Éxito!!",
+                    'data' => $data,
+                    'mensaje' => "Eliminado con Éxito!!",
                 ]);
-            }else{
+            } else {
                 return response()->json([
-                    'data'=>$data,
-                    'mensaje'=>"El usuario no existe (puede que ya la haya eliminado)",
+                    'data' => $data,
+                    'mensaje' => "El usuario no existe (puede que ya la haya eliminado)",
                 ]);
             }
-           
-           
-           
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"El usuario con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "El usuario con id: $id no Existe",
             ]);
         }
     }

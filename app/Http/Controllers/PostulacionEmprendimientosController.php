@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\PostulacionesEmprendimiento;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class PostulacionEmprendimientosController extends Controller
      */
     public function index(Request $request)
     {
-        try { 
+        try {
             $query = PostulacionesEmprendimiento::select(
                 'be_postulacions_empren.id',
                 'be_emprendimientos.nombre_emprendimiento as Empresa',
@@ -28,10 +29,10 @@ class PostulacionEmprendimientosController extends Controller
                 'be_estado_postulaciones_emprend.detalle_estado',
                 'be_postulacions_empren.created_at'
             )
-            ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
-            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
-            ->join('be_estado_postulaciones_emprend', 'be_estado_postulaciones_emprend.postulacion_empren_id', '=', 'be_postulacions_empren.id')
-            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer');
+                ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+                ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+                ->join('be_estado_postulaciones_emprend', 'be_estado_postulaciones_emprend.postulacion_empren_id', '=', 'be_postulacions_empren.id')
+                ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer');
 
             // Si se solicita todo sin paginar
             if ($request->has('all') && $request->all === 'true') {
@@ -50,7 +51,10 @@ class PostulacionEmprendimientosController extends Controller
             $data = $query->paginate(20);
 
             if ($data->isEmpty()) {
-                return response()->json(['error' => 'No se encontraron interacciones'], 404);
+                return response()->json([
+                    'data' => [],
+                    'message' => 'No se encontraron datos'
+                ], 200);
             }
 
             $data->getCollection()->transform(function ($item) {
@@ -82,8 +86,8 @@ class PostulacionEmprendimientosController extends Controller
         $inputs = $request->input();
         $res = PostulacionesEmprendimiento::create($inputs);
         return response()->json([
-            'data'=>$res,
-            'mensaje'=>"Agregado con Éxito!!",
+            'data' => $res,
+            'mensaje' => "Agregado con Éxito!!",
         ]);
     }
 
@@ -108,15 +112,18 @@ class PostulacionEmprendimientosController extends Controller
             'be_estado_postulaciones_emprend.detalle_estado',
             'be_postulacions_empren.created_at'
         )
-        ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
-        ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
-        ->join('be_estado_postulaciones_emprend', 'be_estado_postulaciones_emprend.postulacion_empren_id', '=', 'be_postulacions_empren.id')
-        ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
-        ->where('be_oferta_empleos_empre.id', $id)
-        ->paginate(20);
+            ->join('be_oferta_empleos_empre', 'be_oferta_empleos_empre.id', '=', 'be_postulacions_empren.oferta_emp_id')
+            ->join('be_emprendimientos', 'be_emprendimientos.id', '=', 'be_oferta_empleos_empre.emprendimiento_id')
+            ->join('be_estado_postulaciones_emprend', 'be_estado_postulaciones_emprend.postulacion_empren_id', '=', 'be_postulacions_empren.id')
+            ->join('informacionpersonal', 'informacionpersonal.CIInfPer', '=', 'be_postulacions_empren.CIInfPer')
+            ->where('be_oferta_empleos_empre.id', $id)
+            ->paginate(20);
 
         if ($data->isEmpty()) {
-            return response()->json(['error' => 'No se encontraron interacciones para este emprendimiento'], 404);
+            return response()->json([
+                'data' => [],
+                'message' => 'No se encontraron datos'
+            ], 200);
         }
 
         $data->getCollection()->transform(function ($item) {
@@ -147,27 +154,26 @@ class PostulacionEmprendimientosController extends Controller
     public function update(Request $request, string $id)
     {
         //
-       
+
         $res = PostulacionesEmprendimiento::find($id);
-        if(isset($res)){
+        if (isset($res)) {
             $res->CIInfPer = $request->CIInfPer;
-             $res->oferta_emp_id = $request->oferta_emp_id;
-            if($res->save()){
+            $res->oferta_emp_id = $request->oferta_emp_id;
+            if ($res->save()) {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Actualizado con Éxito!!",
+                    'data' => $res,
+                    'mensaje' => "Actualizado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "Error al Actualizar",
                 ]);
             }
-            else{
-                return response()->json([
-                    'error'=>true,
-                    'mensaje'=>"Error al Actualizar",
-                ]);
-            }
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"La Postulación de Empleo con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "La Postulación de Empleo con id: $id no Existe",
             ]);
         }
     }
@@ -178,26 +184,23 @@ class PostulacionEmprendimientosController extends Controller
     public function destroy(string $id)
     {
         $res = PostulacionesEmprendimiento::find($id);
-        if(isset($res)){
+        if (isset($res)) {
             $elim = PostulacionesEmprendimiento::destroy($id);
-            if($elim){
+            if ($elim) {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"Eliminado con Éxito!!",
+                    'data' => $res,
+                    'mensaje' => "Eliminado con Éxito!!",
                 ]);
-            }else{
+            } else {
                 return response()->json([
-                    'data'=>$res,
-                    'mensaje'=>"La Interacción no existe (puede que ya la haya eliminado)",
+                    'data' => $res,
+                    'mensaje' => "La Interacción no existe (puede que ya la haya eliminado)",
                 ]);
             }
-           
-           
-           
-        }else{
+        } else {
             return response()->json([
-                'error'=>true,
-                'mensaje'=>"La Interacción con id: $id no Existe",
+                'error' => true,
+                'mensaje' => "La Interacción con id: $id no Existe",
             ]);
         }
     }
