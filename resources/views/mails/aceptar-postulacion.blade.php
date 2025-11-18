@@ -119,7 +119,7 @@
         </div>
         
         <!-- Botón de acción -->
-        <a href="http://vinculacionconlasociedad.utelvt.edu.ec/b_e" class="button">Ir a la Bolsa de Empleo</a>
+        <a href="http://192.168.1.19/b_e" class="button">Ir a la Bolsa de Empleo</a>
         
         <!-- Footer -->
         <p class="footer">

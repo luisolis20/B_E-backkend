@@ -105,7 +105,7 @@
         </div>
 
         <!-- Botón -->
-        <a href="http://vinculacionconlasociedad.utelvt.edu.ec/b_e" class="button">Explorar Otras Ofertas</a>
+        <a href="http://192.168.1.19/b_e" class="button">Explorar Otras Ofertas</a>
 
         <!-- Footer -->
         <p class="footer">
