@@ -79,6 +79,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource('vin/informacionpersonal', InformacionPersonalController::class);
     Route::apiResource('vin/informacionpersonalD', InformacionPersonalDController::class);
     Route::get('vin/informacionpersonalD/{ci}/foto', [InformacionPersonalDController::class, 'getFotografia']);
+    Route::get('vin/fotografia/{ci}', [InformacionPersonalDController::class, 'getFotografia2']);
     Route::get('vin/getdocentes', [InformacionPersonalDController::class, 'getdocentes']);
     Route::get('vin/estudiantesfoto', [InformacionPersonalDController::class, 'estudiantesfoto']); //nuevo
     Route::apiResource("vin/postulacions2", Postulacion2Controller::class);
@@ -89,6 +90,7 @@ Route::prefix('b_e')->group(function () {
     Route::apiResource('vin/estadopostuser2empr', ConstEstadoEMprendimientoPOST2Controller::class);
     Route::apiResource('vin/consultanopostofertp', ConstOfertasNOPOST::class);
     Route::apiResource('vin/consultanopostemprep', ConstEmprendimientosNOPOST::class);
+    Route::get('vin/descargarfotosmasiva', [InformacionPersonalDController::class, 'descargarFotosMasiva']);
 
     //Login
 
