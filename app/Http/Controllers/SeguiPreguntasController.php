@@ -15,80 +15,88 @@ class SeguiPreguntasController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = SeguiPreguntas::select(
-                'seguipreguntas.ID',
-                'seguipreguntas.PREGUNTA',
-                'seguipreguntas.IDFORMULARIO',
-                'seguipreguntas.UP',
-                'seguipreguntas.FINS',
-                'seguipreguntas.UD',
-                'seguipreguntas.FDEL',
-                'seguipreguntas.tipo',
-                'seguiformulario.ID as id_formulario',
-                'seguiformulario.NOMBRE',
-                DB::raw('COUNT(DISTINCT seguitiporespuesta.ID) as total_tipos_respuesta'),
-            )
-                ->join('seguiformulario', 'seguiformulario.ID', '=', 'seguipreguntas.IDFORMULARIO')
-                ->leftJoin('seguitiporespuesta', 'seguitiporespuesta.IDPREGUNTA', '=', 'seguipreguntas.ID')
-                ->groupBy(
-                    'seguipreguntas.ID',
-                    'seguipreguntas.PREGUNTA',
-                    'seguipreguntas.IDFORMULARIO',
-                    'seguipreguntas.UP',
-                    'seguipreguntas.FINS',
-                    'seguipreguntas.UD',
-                    'seguipreguntas.FDEL',
-                    'seguipreguntas.tipo',
-                    'seguiformulario.ID',
-                    'seguiformulario.NOMBRE',
-                ); // 🔹 Orden opcional para mostrar los más recientes primero
+            // Parámetro del formulario
+            $formularioId = $request->query('formulario_id');
 
-            // Si el usuario pide todos los datos (sin paginación)
-            if ($request->has('all') && $request->all === 'true') {
-                $data = $query->get();
+            // SQL de tu consulta EXACTA
+            $sql = "
+            SELECT 
+                seguipreguntas.ID,
+                seguipreguntas.PREGUNTA,
+                seguipreguntas.IDFORMULARIO,
+                seguipreguntas.UP,
+                seguipreguntas.FINS,
+                seguipreguntas.UD,
+                seguipreguntas.FDEL,
+                seguipreguntas.tipo,
+                seguiformulario.ID AS id_formulario,
+                seguiformulario.NOMBRE,
+                COUNT(DISTINCT seguitiporespuesta.ID) AS total_tipos_respuesta
+            FROM seguipreguntas
+            INNER JOIN seguiformulario 
+                ON seguiformulario.ID = seguipreguntas.IDFORMULARIO
+            LEFT JOIN seguitiporespuesta 
+                ON seguitiporespuesta.IDPREGUNTA = seguipreguntas.ID
+            WHERE seguipreguntas.IDFORMULARIO = ?
+            GROUP BY 
+                seguipreguntas.ID,
+                seguipreguntas.PREGUNTA,
+                seguipreguntas.IDFORMULARIO,
+                seguipreguntas.UP,
+                seguipreguntas.FINS,
+                seguipreguntas.UD,
+                seguipreguntas.FDEL,
+                seguipreguntas.tipo,
+                seguiformulario.ID,
+                seguiformulario.NOMBRE";
 
-                $data->transform(function ($item) {
-                    $attributes = $item->getAttributes();
-                    foreach ($attributes as $key => $value) {
+            // Si el usuario pide todo
+            if ($request->query('all') === 'true') {
+                $data = DB::select($sql, [$formularioId]);
+
+                // Convertir a UTF-8
+                $data = collect($data)->map(function ($item) {
+                    foreach ($item as $key => $value) {
                         if (is_string($value)) {
-                            $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                            $item->$key = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                         }
                     }
-                    return $attributes;
+                    return $item;
                 });
 
                 return response()->json(['data' => $data]);
             }
 
-            // 🔹 Paginación (por defecto 20)
-            $data = $query->paginate(20);
+            // PAGINACIÓN MANUAL
+            $page = $request->query('page', 1);
+            $perPage = 20;
 
-            if ($data->isEmpty()) {
-                return response()->json([
-                    'data' => [],
-                    'message' => 'No se encontraron datos'
-                ], 200);
-            }
+            $allData = collect(DB::select($sql, [$formularioId]));
 
-            $data->getCollection()->transform(function ($item) {
-                $attributes = $item->getAttributes();
-                foreach ($attributes as $key => $value) {
+            // Procesar UTF-8
+            $allData = $allData->map(function ($item) {
+                foreach ($item as $key => $value) {
                     if (is_string($value)) {
-                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                        $item->$key = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
-                return $attributes;
+                return $item;
             });
 
+            $total = $allData->count();
+            $items = $allData->slice(($page - 1) * $perPage, $perPage)->values();
+
             return response()->json([
-                'data' => $data->items(),
-                'current_page' => $data->currentPage(),
-                'per_page' => $data->perPage(),
-                'total' => $data->total(),
-                'last_page' => $data->lastPage(),
+                'data' => $items,
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'last_page' => ceil($total / $perPage),
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Error al ejecutar consulta SQL: ' . $e->getMessage()
+            ], 500);
         }
     }
 
